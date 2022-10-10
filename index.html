@@ -10,7 +10,7 @@
         {
             background-color: #DDDDDD;
         }
-        span
+        .valueDisplay
         {
             font-size:1.5em;
             margin-left:1em;
@@ -20,6 +20,17 @@
             width:50%;
             max-width:400px;
         }
+        .selector
+        {
+            height:4em;
+            width:4em;
+            margin:2em;
+        }
+        .selectorLabel
+        {
+            font-size:2em;  
+        }
+        
     </style>
 </head>
 
@@ -30,23 +41,45 @@
 <button id="b" onClick="go();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">▶️</button> <button id="regenButton" onClick="regen();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">🔁</button>
 
 <pre>                    
-     TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay">120</span>
+  TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay"  class="valueDisplay" >120</span>
 
+<hr/>
 
-  BD STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="bdSeqSteps=this.value; document.getElementById('bdStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdStepsDisplay"> 16</span>
-  BD MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="bdSeqMulti=this.value; document.getElementById('bdMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdMultiDisplay">  8</span>
-BD DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="bdDensity=this.value; document.getElementById('bdDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdDensityDisplay">100</span>
+  STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
 
+  MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
 
-  HAT STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="hatSeqSteps=this.value; document.getElementById('hatStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatStepsDisplay"> 16</span>
-  HAT MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="hatSeqMulti=this.value; document.getElementById('hatMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatMultiDisplay">  8</span>
-HAT DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="hatDensity=this.value; document.getElementById('hatDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatDensityDisplay">100</span>
+DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
 
-
-  SNR STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="snrSeqSteps=this.value; document.getElementById('snrStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrStepsDisplay"> 16</span>
-  SNR MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="snrSeqMulti=this.value; document.getElementById('snrMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrMultiDisplay">  8</span>
-SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="snrDensity=this.value; document.getElementById('snrDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrDensityDisplay">100</span>
 </pre>
+
+<div style="width:320px; margin:0 auto; text-align:center;">
+<div style="float:left;">
+    <div>
+        <input type="checkbox" class="selector" id="bdSelector" checked="checked" onchange="bdSelected=this.checked;">
+    </div>
+    <div>
+        <label for="bdSelector" class="selectorLabel">BD</label>
+    </div>
+</div>
+<div style="float:left;">
+    <div>
+        <input type="checkbox" class="selector" id="hatSelector" checked="checked" onchange="hatSelected=this.checked;">
+    </div>
+    <div>
+        <label for="hatSelector" class="selectorLabel">HAT</label>
+    </div>
+</div>
+<div style="float:left;">
+    <div>
+        <input type="checkbox" class="selector" id="snrSelector" label="SNR" checked="checked" onchange="snrSelected=this.checked;">
+    </div>
+    <div>
+        <label for="snrSelector" class="selectorLabel">SNR</label>
+    </div>
+</div>
+<br/>
+</div>
 
 </div>
 
@@ -58,6 +91,9 @@ SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" on
 
         var playing = false;
         var tempo = 120;
+        var bdSelected = true;
+        var hatSelected = true;
+        var snrSelected = true;
 
         function go()
         {
@@ -102,6 +138,60 @@ SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" on
             bdSeq = getSequence(0.2);
             hatSeq = getSequence(0.75);
             snrSeq = getSequence(0.2);
+        }
+
+        function stepsChanged(value)
+        {            
+            document.getElementById('stepsDisplay').innerHTML=String(value).padStart(3,' ');
+
+            if (bdSelected)
+            {
+                bdSeqSteps=value;
+            }
+            if (hatSelected)
+            {
+                hatSeqSteps=value;
+            }
+            if (snrSelected)
+            {
+                snrSeqSteps=value;
+            }            
+        }
+
+        function multiChanged(value)
+        {
+            document.getElementById('multiDisplay').innerHTML=String(value).padStart(3,' ');
+
+            if (bdSelected)
+            {
+                bdSeqMulti=value;
+            }
+            if (hatSelected)
+            {
+                hatSeqMulti=value;
+            }
+            if (snrSelected)
+            {
+                snrSeqMulti=value;
+            }            
+        }
+
+        function densityChanged(value)
+        {
+            document.getElementById('densityDisplay').innerHTML=String(value).padStart(3,' ');
+
+            if (bdSelected)
+            {
+                bdDensity=value;
+            }
+            if (hatSelected)
+            {
+                hatDensity=value;
+            }
+            if (snrSelected)
+            {
+                snrDensity=value;
+            }            
         }
 
 
