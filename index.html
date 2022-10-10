@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-	<title>wf.gen4</title>
+	<title>FieldsOS</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
     <style>
@@ -33,17 +33,17 @@
      TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay">120</span>
 
 
-  BD STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="bdSeqSteps=this.value; document.getElementById('bdStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdStepsDisplay"> 16</span>
+  BD STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="bdSeqSteps=this.value; document.getElementById('bdStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdStepsDisplay"> 16</span>
   BD MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="bdSeqMulti=this.value; document.getElementById('bdMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdMultiDisplay">  8</span>
 BD DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="bdDensity=this.value; document.getElementById('bdDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdDensityDisplay">100</span>
 
 
-  HAT STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="hatSeqSteps=this.value; document.getElementById('hatStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatStepsDisplay"> 16</span>
+  HAT STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="hatSeqSteps=this.value; document.getElementById('hatStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatStepsDisplay"> 16</span>
   HAT MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="hatSeqMulti=this.value; document.getElementById('hatMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatMultiDisplay">  8</span>
 HAT DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="hatDensity=this.value; document.getElementById('hatDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatDensityDisplay">100</span>
 
 
-  SNR STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="snrSeqSteps=this.value; document.getElementById('snrStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrStepsDisplay"> 16</span>
+  SNR STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="snrSeqSteps=this.value; document.getElementById('snrStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrStepsDisplay"> 16</span>
   SNR MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="snrSeqMulti=this.value; document.getElementById('snrMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrMultiDisplay">  8</span>
 SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="snrDensity=this.value; document.getElementById('snrDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrDensityDisplay">100</span>
 </pre>
@@ -205,44 +205,75 @@ SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" on
 
         regen(); 
 
+        
         const loop = new Tone.Loop((time) => {
                                                  
             // BD
-            bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % bdSeqSteps;
+            if (bdSeqSteps == 1)  // Special case when step count is 1
+            {
+                bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % 2; // Pretend there are two steps
+                bdSeqPosEffective = 0;                              // But always use the first value
+            }
+            else
+            {
+                bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % bdSeqSteps;
+                bdSeqPosEffective = bdSeqPos;
+            }            
             if (bdSeqPos != bdSeqPosPrev)
             {            
-                if (bdSeq[bdSeqPos] > 0 && Math.random() < bdSeq[bdSeqPos]) {
+                if (bdSeq[bdSeqPosEffective] > 0 && Math.random() < bdSeq[bdSeqPosEffective]) {
                     if (Math.random() < bdDensity/100)
                     {
-                        bd(time, bdSeq[bdSeqPos]);
+                        bd(time, bdSeq[bdSeqPosEffective]);
                     }                    
                 }
             }
             bdSeqPosPrev = bdSeqPos;
 
             // HAT
-            hatSeqPos = Math.floor((counter / 32) * hatSeqMulti) % hatSeqSteps;
-            if (hatSeqPos != hatSeqPosPrev) {
-                if (hatSeq[hatSeqPos] > 0 && Math.random() < hatSeq[hatSeqPos]) {
+            if (hatSeqSteps == 1)  // Special case when step count is 1
+            {
+                hatSeqPos = Math.floor((counter/32)*hatSeqMulti) % 2; // Pretend there are two steps
+                hatSeqPosEffective = 0;                              // But always use the first value
+            }
+            else
+            {
+                hatSeqPos = Math.floor((counter/32)*hatSeqMulti) % hatSeqSteps;
+                hatSeqPosEffective = hatSeqPos;
+            }            
+            if (hatSeqPos != hatSeqPosPrev)
+            {            
+                if (hatSeq[hatSeqPosEffective] > 0 && Math.random() < hatSeq[hatSeqPosEffective]) {
                     if (Math.random() < hatDensity/100)
                     {
-                        hat(time, hatSeq[hatSeqPos]);
-                    }
+                        hat(time, hatSeq[hatSeqPosEffective]);
+                    }                    
                 }
             }
             hatSeqPosPrev = hatSeqPos;
 
             // SNR
-            snrSeqPos = Math.floor((counter / 32) * snrSeqMulti) % snrSeqSteps;
-            if (snrSeqPos != snrSeqPosPrev && Math.random() < snrSeq[snrSeqPos]) {
-                if (snrSeq[snrSeqPos] > 0) {
+            if (snrSeqSteps == 1)  // Special case when step count is 1
+            {
+                snrSeqPos = Math.floor((counter/32)*snrSeqMulti) % 2; // Pretend there are two steps
+                snrSeqPosEffective = 0;                              // But always use the first value
+            }
+            else
+            {
+                snrSeqPos = Math.floor((counter/32)*snrSeqMulti) % snrSeqSteps;
+                snrSeqPosEffective = snrSeqPos;
+            }            
+            if (snrSeqPos != snrSeqPosPrev)
+            {            
+                if (snrSeq[snrSeqPosEffective] > 0 && Math.random() < snrSeq[snrSeqPosEffective]) {
                     if (Math.random() < snrDensity/100)
                     {
-                        snr(time, snrSeq[snrSeqPos]);
-                    }
+                        snr(time, snrSeq[snrSeqPosEffective]);
+                    }                    
                 }
             }
             snrSeqPosPrev = snrSeqPos;
+
 
             counter++;
 
