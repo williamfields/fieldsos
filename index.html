@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+	<title>wf.gen4</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
+    <style>
+        body 
+        {
+            background-color: #DDDDDD;
+        }
+        span
+        {
+            font-size:1.5em;
+            margin-left:1em;
+        }
+        .slider
+        {
+            width:50%;
+            max-width:400px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="position:absolute; top:50%; transform: translate(-50%, -50%); left:50%; width:80vw; text-align:center;">
+        
+<button id="b" onClick="go();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">▶️</button> <button id="regenButton" onClick="regen();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">🔁</button>
+
+<pre>                    
+     TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay">120</span>
+
+
+  BD STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="bdSeqSteps=this.value; document.getElementById('bdStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdStepsDisplay"> 16</span>
+  BD MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="bdSeqMulti=this.value; document.getElementById('bdMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdMultiDisplay">  8</span>
+BD DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="bdDensity=this.value; document.getElementById('bdDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="bdDensityDisplay">100</span>
+
+
+  HAT STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="hatSeqSteps=this.value; document.getElementById('hatStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatStepsDisplay"> 16</span>
+  HAT MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="hatSeqMulti=this.value; document.getElementById('hatMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatMultiDisplay">  8</span>
+HAT DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="hatDensity=this.value; document.getElementById('hatDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="hatDensityDisplay">100</span>
+
+
+  SNR STEPS: <input type="range" class="slider" min="2" max="16" value="16" oninput="snrSeqSteps=this.value; document.getElementById('snrStepsDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrStepsDisplay"> 16</span>
+  SNR MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="snrSeqMulti=this.value; document.getElementById('snrMultiDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrMultiDisplay">  8</span>
+SNR DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="snrDensity=this.value; document.getElementById('snrDensityDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="snrDensityDisplay">100</span>
+</pre>
+
+</div>
+
+	<script type="text/javascript">
+       
+        // ------------------------------------------------
+        // CONTROLS
+        // ------------------------------------------------
+
+        var playing = false;
+        var tempo = 120;
+
+        function go()
+        {
+            if (!playing)
+            {
+                play();
+                playing = true;
+                document.getElementById("b").innerHTML = '⏸';
+            }                
+            else
+            {
+                stop();
+                playing = false;
+                document.getElementById("b").innerHTML = '▶️';
+            }                
+        }
+
+        function stop()
+        {
+            loop.stop();
+            Tone.Transport.stop();  
+        }
+
+        function play()
+        {                        
+            counter = 0;
+            bdSeqPos = 0;
+            hatSeqPos = 0;
+            snrSeqPos = 0;
+
+            Tone.Transport.start();                        
+            loop.start(0);
+        }
+
+        function regen()
+        {
+            document.getElementById("regenButton").style.backgroundColor='yellow';
+            setTimeout(()=>{
+                document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
+            },100);
+
+            bdSeq = getSequence(0.2);
+            hatSeq = getSequence(0.75);
+            snrSeq = getSequence(0.2);
+        }
+
+
+        // ------------------------------------------------
+        // SYNTHS
+        // ------------------------------------------------
+    
+        function bd(time, vel)
+        {
+            if (typeof bdSynth == "undefined")
+            {
+                bdSynth = new Tone.MembraneSynth(
+                    {
+                        volume: 0,
+                        octaves: 5,
+                        envelope: {
+                            attack: 0.001,
+                            decay: 0,
+                            release: 0.1
+                        }
+                    }).toDestination();
+            }
+            bdSynth.triggerAttackRelease(50, "16n", time, vel);
+        }
+
+        function hat(time, vel)
+        {
+            if (typeof hatSynth == "undefined")
+            {
+                hatSynth = new Tone.MetalSynth({
+                    harmonicity: 4,
+                    resonance: 500,
+                    modulationIndex: 128,
+                    envelope: {
+                        decay: 0.2,
+                    },
+                    volume: -6
+                }).toDestination();
+            }
+            hatSynth.triggerAttackRelease("C4", "32n", time, vel);
+        }
+
+        function snr(time,vel)
+        {
+            if (typeof snareNoiseSynth == "undefined")
+            {
+                snareNoiseSynth = new Tone.NoiseSynth({
+                    noise: {
+                        type: "white"
+                    },
+                    envelope: {
+                        attack: 0.001,
+                        decay: 0.2,
+                        release: 0.25
+                    }
+                }).toDestination();
+
+                snareToneSynth = new Tone.MembraneSynth({
+                        volume: -6,
+                        octaves: 1,
+                        envelope: {
+                            attack: 0.001,
+                            decay: 0.1,
+                            release: 0.25
+                        }
+                    }).toDestination();                
+            }
+
+            snareNoiseSynth.triggerAttackRelease("64n", time, vel);
+            snareToneSynth.triggerAttackRelease(400, "64n", time, vel);       
+        }
+
+
+        // ------------------------------------------------
+        // SEQUENCING
+        // ------------------------------------------------
+        
+        //var bdSeq = [1, 0, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 0.25, 0.25, 0, 1, 0];
+        var bdSeq = [];
+        var bdSeqSteps = 16;
+        var bdSeqMulti = 8;
+        var bdSeqPos = 0;
+        var bdSeqPosPrev = -1;
+        var bdDensity = 100;
+
+        //var hatSeq = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0.25, 1, 0, 1, 0.25, 1, 0.25];
+        var hatSeq = [];
+        var hatSeqSteps = 16;
+        var hatSeqMulti = 8;
+        var hatSeqPos = 0;
+        var hatSeqPosPrev = -1;
+        var hatDensity = 100;
+ 
+        //var snrSeq = [0, 0, 0, 0, 1, 0, 0, 0.25, 0, 0.25, 0, 0, 1, 0, 0, 0.5];
+        var snrSeq = [];
+        var snrSeqSteps = 16;
+        var snrSeqMulti = 8;
+        var snrSeqPos = 0;
+        var snrSeqPosPrev = -1;
+        var snrDensity = 100;
+
+        regen(); 
+
+        const loop = new Tone.Loop((time) => {
+                                                 
+            // BD
+            bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % bdSeqSteps;
+            if (bdSeqPos != bdSeqPosPrev)
+            {            
+                if (bdSeq[bdSeqPos] > 0 && Math.random() < bdSeq[bdSeqPos]) {
+                    if (Math.random() < bdDensity/100)
+                    {
+                        bd(time, bdSeq[bdSeqPos]);
+                    }                    
+                }
+            }
+            bdSeqPosPrev = bdSeqPos;
+
+            // HAT
+            hatSeqPos = Math.floor((counter / 32) * hatSeqMulti) % hatSeqSteps;
+            if (hatSeqPos != hatSeqPosPrev) {
+                if (hatSeq[hatSeqPos] > 0 && Math.random() < hatSeq[hatSeqPos]) {
+                    if (Math.random() < hatDensity/100)
+                    {
+                        hat(time, hatSeq[hatSeqPos]);
+                    }
+                }
+            }
+            hatSeqPosPrev = hatSeqPos;
+
+            // SNR
+            snrSeqPos = Math.floor((counter / 32) * snrSeqMulti) % snrSeqSteps;
+            if (snrSeqPos != snrSeqPosPrev && Math.random() < snrSeq[snrSeqPos]) {
+                if (snrSeq[snrSeqPos] > 0) {
+                    if (Math.random() < snrDensity/100)
+                    {
+                        snr(time, snrSeq[snrSeqPos]);
+                    }
+                }
+            }
+            snrSeqPosPrev = snrSeqPos;
+
+            counter++;
+
+        }, "64n");
+
+  
+
+        // ------------------------------------------------
+        // HELPERS
+        // ------------------------------------------------
+                
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function probDo(x) 
+        {
+            return Math.random() < x;
+        }
+
+
+        function getSequence(seqDensity)
+        {		
+            var seq = [];
+            for (var i=0;i<16;i++)
+            {
+                var f = 0;
+                var r = Math.random();
+                if (r < seqDensity)
+                {
+                    f = 1;
+                }
+                else if (r < 0.3)
+                {
+                    f = Math.random();				
+                }
+                else
+                {
+                    f = 0;
+                }
+                seq[i] = f;
+            }
+
+            if (probDo(0.5))
+            {
+                seq[0] = 1;
+            }
+
+            return seq;
+        }
+
+	</script>
+</body>
+</html>
