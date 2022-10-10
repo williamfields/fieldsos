@@ -24,7 +24,7 @@
         {
             height:4em;
             width:4em;
-            margin:2em;
+            margin:2em;        
         }
         .selectorLabel
         {
@@ -50,6 +50,8 @@
   MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="document.getElementById('multiDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
 
 DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="document.getElementById('densityDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
+
+  DECAY: <input type="range" class="slider" min="1" max="100" value="50" oninput="document.getElementById('decayDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="decayChanged(this.value);"><span  class="valueDisplay" id="decayDisplay">50</span>
 
 </pre>
 
@@ -188,6 +190,43 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
             }            
         }
 
+        function decayChanged(value)
+        {
+            if (bdSelected)
+            {
+                bdSynth.set({
+                    envelope: {
+                        release: 10,
+                        decay: 0.01 + Math.pow((value/100),3)
+                    }
+                });
+            }
+            if (hatSelected)
+            {
+                hatSynth.set({
+                    envelope: {
+                        release: 10,
+                        decay: 0.01 + Math.pow((value/100),3)
+                    }
+                });
+            }
+            if (snrSelected)
+            {
+                snareToneSynth.set({
+                    envelope: {
+                        release: 10,
+                        decay: 0.01 + Math.pow((value/100),2)*0.1
+                    }
+                });
+                snareNoiseSynth.set({
+                    envelope: {
+                        release: 10,
+                        decay: 0.01 + Math.pow((value/100),2)*0.3
+                    }
+                });
+
+            }            
+        }
 
         // ------------------------------------------------
         // SYNTHS
@@ -199,16 +238,15 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
             {
                 bdSynth = new Tone.MembraneSynth(
                     {
-                        volume: 0,
+                        volume: 6,
                         octaves: 5,
                         envelope: {
-                            attack: 0.001,
-                            decay: 0,
-                            release: 0.1
+                            decay: 0.01 + Math.pow((bdDecay/100),3),  // TODO: Fix so same logic is not in two places
+                            release: 10
                         }
                     }).toDestination();
             }
-            bdSynth.triggerAttackRelease(50, "16n", time, vel);
+            bdSynth.triggerAttackRelease(60, "16n", time, vel);
         }
 
         function hat(time, vel)
@@ -219,8 +257,9 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                     harmonicity: 4,
                     resonance: 500,
                     modulationIndex: 128,
-                    envelope: {
-                        decay: 0.2,
+                    envelope: {                        
+                        decay: 0.01 + Math.pow((hatDecay/100),3),  // TODO: Fix so same logic is not in two places
+                        release: 10
                     },
                     volume: -6
                 }).toDestination();
@@ -237,19 +276,18 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                         type: "white"
                     },
                     envelope: {
-                        attack: 0.001,
-                        decay: 0.2,
-                        release: 0.25
-                    }
+                        decay: 0.01 + Math.pow((snrDecay/100),2)*0.3,  // TODO: Fix so same logic is not in two places
+                        release: 10
+                    },
+                    volume: -0
                 }).toDestination();
 
                 snareToneSynth = new Tone.MembraneSynth({
                         volume: -6,
                         octaves: 1,
                         envelope: {
-                            attack: 0.001,
-                            decay: 0.1,
-                            release: 0.25
+                            decay: 0.01 + Math.pow((snrDecay/100),2)*0.1,  // TODO: Fix so same logic is not in two places
+                            release: 10
                         }
                     }).toDestination();                
             }
@@ -269,7 +307,8 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         var bdSeqMulti = 8;
         var bdSeqPos = 0;
         var bdSeqPosPrev = -1;
-        var bdDensity = 100;
+        var bdDensity = 100;        
+        var bdDecay = 50;
 
         //var hatSeq = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0.25, 1, 0, 1, 0.25, 1, 0.25];
         var hatSeq = [];
@@ -278,6 +317,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         var hatSeqPos = 0;
         var hatSeqPosPrev = -1;
         var hatDensity = 100;
+        var hatDecay = 50;
  
         //var snrSeq = [0, 0, 0, 0, 1, 0, 0, 0.25, 0, 0.25, 0, 0, 1, 0, 0, 0.5];
         var snrSeq = [];
@@ -285,7 +325,8 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         var snrSeqMulti = 8;
         var snrSeqPos = 0;
         var snrSeqPosPrev = -1;
-        var snrDensity = 100;
+        var snrDensity = 100;        
+        var snrDecay = 50;
 
         regen(); 
 
