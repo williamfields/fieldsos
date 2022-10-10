@@ -41,15 +41,15 @@
 <button id="b" onClick="go();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">▶️</button> <button id="regenButton" onClick="regen();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">🔁</button>
 
 <pre>                    
-  TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay"  class="valueDisplay" >120</span>
+  TEMPO: <input type="range" class="slider" min="1" max="200" value="120" oninput="document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay"  class="valueDisplay" >120</span>
 
 <hr/>
 
-  STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
+  STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="document.getElementById('stepsDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
 
-  MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
+  MULTI: <input type="range" class="slider" min="1" max="16" value="4" oninput="document.getElementById('multiDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
 
-DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
+DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="document.getElementById('densityDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
 
 </pre>
 
@@ -141,9 +141,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         }
 
         function stepsChanged(value)
-        {            
-            document.getElementById('stepsDisplay').innerHTML=String(value).padStart(3,' ');
-
+        {                        
             if (bdSelected)
             {
                 bdSeqSteps=value;
@@ -160,8 +158,6 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
 
         function multiChanged(value)
         {
-            document.getElementById('multiDisplay').innerHTML=String(value).padStart(3,' ');
-
             if (bdSelected)
             {
                 bdSeqMulti=value;
@@ -178,8 +174,6 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
 
         function densityChanged(value)
         {
-            document.getElementById('densityDisplay').innerHTML=String(value).padStart(3,' ');
-
             if (bdSelected)
             {
                 bdDensity=value;
