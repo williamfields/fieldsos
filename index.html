@@ -144,156 +144,155 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
 
         function stepsChanged(value)
         {                        
-            if (bdSelected)
-            {
-                bdSeqSteps=value;
-            }
-            if (hatSelected)
-            {
-                hatSeqSteps=value;
-            }
-            if (snrSelected)
-            {
-                snrSeqSteps=value;
-            }            
+            if (bdSelected) bdSeqSteps=value;
+            if (hatSelected) hatSeqSteps=value;
+            if (snrSelected) snrSeqSteps=value;
         }
 
         function multiChanged(value)
         {
-            if (bdSelected)
-            {
-                bdSeqMulti=value;
-            }
-            if (hatSelected)
-            {
-                hatSeqMulti=value;
-            }
-            if (snrSelected)
-            {
-                snrSeqMulti=value;
-            }            
+            if (bdSelected) bdSeqMulti=value;
+            if (hatSelected) hatSeqMulti=value;
+            if (snrSelected) snrSeqMulti=value;
         }
 
         function densityChanged(value)
         {
-            if (bdSelected)
-            {
-                bdDensity=value;
-            }
-            if (hatSelected)
-            {
-                hatDensity=value;
-            }
-            if (snrSelected)
-            {
-                snrDensity=value;
-            }            
+            if (bdSelected) bdDensity=value;
+            if (hatSelected) hatDensity=value;
+            if (snrSelected) snrDensity=value;
         }
 
         function decayChanged(value)
         {
-            if (bdSelected)
-            {
-                bdSynth.set({
-                    envelope: {
-                        release: 10,
-                        decay: 0.01 + Math.pow((value/100),3)
-                    }
-                });
-            }
-            if (hatSelected)
-            {
-                hatSynth.set({
-                    envelope: {
-                        release: 10,
-                        decay: 0.01 + Math.pow((value/100),3)
-                    }
-                });
-            }
-            if (snrSelected)
-            {
-                snareToneSynth.set({
-                    envelope: {
-                        release: 10,
-                        decay: 0.01 + Math.pow((value/100),2)*0.1
-                    }
-                });
-                snareNoiseSynth.set({
-                    envelope: {
-                        release: 10,
-                        decay: 0.01 + Math.pow((value/100),2)*0.3
-                    }
-                });
-
-            }            
+            if (bdSelected) bd.setDecay(value);
+            if (hatSelected) hat.setDecay(value);
+            if (snrSelected) snr.setDecay(value);
         }
 
         // ------------------------------------------------
         // SYNTHS
         // ------------------------------------------------
     
-        function bd(time, vel)
+        class bdPatch
         {
-            if (typeof bdSynth == "undefined")
-            {
-                bdSynth = new Tone.MembraneSynth(
+            #bdSynth;
+            decay = 50;
+
+            constructor()
+            {                
+                this.bdSynth = new Tone.MembraneSynth(
                     {
                         volume: 6,
                         octaves: 5,
                         envelope: {
-                            decay: 0.01 + Math.pow((bdDecay/100),3),  // TODO: Fix so same logic is not in two places
                             release: 10
                         }
                     }).toDestination();
+
+                    this.setDecay(this.decay);
             }
-            bdSynth.triggerAttackRelease(60, "16n", time, vel);
+
+            trigger(time,vel)
+            {
+                this.bdSynth.triggerAttackRelease(60, "16n", time, vel);
+            }
+
+            setDecay(value)
+            {
+                this.bdSynth.set({
+                    envelope: {
+                        decay: 0.01 + Math.pow((value/100),3)
+                    }
+                });
+            }
         }
 
-        function hat(time, vel)
+
+        class hatPatch
         {
-            if (typeof hatSynth == "undefined")
-            {
-                hatSynth = new Tone.MetalSynth({
+            #hatSynth;
+            decay = 50;
+
+            constructor()
+            {                
+                this.hatSynth = new Tone.MetalSynth({
                     harmonicity: 4,
                     resonance: 500,
                     modulationIndex: 128,
                     envelope: {                        
-                        decay: 0.01 + Math.pow((hatDecay/100),3),  // TODO: Fix so same logic is not in two places
                         release: 10
                     },
                     volume: -6
                 }).toDestination();
+
+                this.setDecay(this.decay);
             }
-            hatSynth.triggerAttackRelease("C4", "32n", time, vel);
+
+            trigger(time,vel)
+            {
+                this.hatSynth.triggerAttackRelease("C4", "32n", time, vel);
+            }
+
+            setDecay(value)
+            {
+                this.hatSynth.set({
+                    envelope: {
+                        decay: 0.01 + Math.pow((value/100),3),
+                    }
+                });
+            }
         }
 
-        function snr(time,vel)
+
+        class snrPatch
         {
-            if (typeof snareNoiseSynth == "undefined")
-            {
-                snareNoiseSynth = new Tone.NoiseSynth({
+            #snrNoiseSynth;
+            #snrToneSynth;
+            decay = 50;
+
+            constructor()
+            {                
+                this.snrNoiseSynth = new Tone.NoiseSynth({
                     noise: {
                         type: "white"
                     },
-                    envelope: {
-                        decay: 0.01 + Math.pow((snrDecay/100),2)*0.3,  // TODO: Fix so same logic is not in two places
+                    envelope: {                        
                         release: 10
                     },
-                    volume: -0
+                    volume: 0
                 }).toDestination();
 
-                snareToneSynth = new Tone.MembraneSynth({
-                        volume: -6,
-                        octaves: 1,
-                        envelope: {
-                            decay: 0.01 + Math.pow((snrDecay/100),2)*0.1,  // TODO: Fix so same logic is not in two places
-                            release: 10
-                        }
-                    }).toDestination();                
+                this.snrToneSynth = new Tone.MembraneSynth({
+                    volume: -6,
+                    octaves: 1,
+                    envelope: {                            
+                        release: 10
+                    }
+                }).toDestination();       
+
+                this.setDecay(this.decay);
             }
 
-            snareNoiseSynth.triggerAttackRelease("64n", time, vel);
-            snareToneSynth.triggerAttackRelease(400, "64n", time, vel);       
+            trigger(time,vel)
+            {
+                this.snrNoiseSynth.triggerAttackRelease("64n", time, vel); 
+                this.snrToneSynth.triggerAttackRelease(400, "64n", time, vel);      
+            }
+
+            setDecay(value)
+            {
+                this.snrNoiseSynth.set({
+                    envelope: {
+                        decay: 0.01 + Math.pow((value/100),2)*0.3
+                    }
+                });
+                this.snrToneSynth.set({
+                    envelope: {
+                        decay: 0.01 + Math.pow((value/100),2)*0.1
+                    }
+                });
+            }
         }
 
 
@@ -302,6 +301,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         // ------------------------------------------------
         
         //var bdSeq = [1, 0, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 0.25, 0.25, 0, 1, 0];
+        var bd = new bdPatch();
         var bdSeq = [];
         var bdSeqSteps = 16;
         var bdSeqMulti = 8;
@@ -311,6 +311,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         var bdDecay = 50;
 
         //var hatSeq = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0.25, 1, 0, 1, 0.25, 1, 0.25];
+        var hat = new hatPatch();
         var hatSeq = [];
         var hatSeqSteps = 16;
         var hatSeqMulti = 8;
@@ -320,6 +321,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         var hatDecay = 50;
  
         //var snrSeq = [0, 0, 0, 0, 1, 0, 0, 0.25, 0, 0.25, 0, 0, 1, 0, 0, 0.5];
+        var snr = new snrPatch();
         var snrSeq = [];
         var snrSeqSteps = 16;
         var snrSeqMulti = 8;
@@ -349,7 +351,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 if (bdSeq[bdSeqPosEffective] > 0 && Math.random() < bdSeq[bdSeqPosEffective]) {
                     if (Math.random() < bdDensity/100)
                     {
-                        bd(time, bdSeq[bdSeqPosEffective]);
+                        bd.trigger(time, bdSeq[bdSeqPosEffective]);
                     }                    
                 }
             }
@@ -371,7 +373,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 if (hatSeq[hatSeqPosEffective] > 0 && Math.random() < hatSeq[hatSeqPosEffective]) {
                     if (Math.random() < hatDensity/100)
                     {
-                        hat(time, hatSeq[hatSeqPosEffective]);
+                        hat.trigger(time, hatSeq[hatSeqPosEffective]);
                     }                    
                 }
             }
@@ -393,7 +395,7 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 if (snrSeq[snrSeqPosEffective] > 0 && Math.random() < snrSeq[snrSeqPosEffective]) {
                     if (Math.random() < snrDensity/100)
                     {
-                        snr(time, snrSeq[snrSeqPosEffective]);
+                        snr.trigger(time, snrSeq[snrSeqPosEffective]);
                     }                    
                 }
             }
