@@ -137,9 +137,9 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
             },100);
 
-            bd.seq = getSequence(0.2);
-            hat.seq = getSequence(0.75);
-            snr.seq = getSequence(0.2);
+            if (bdSelected)  bd.randomize();
+            if (hatSelected) hat.randomize();
+            if (snrSelected) snr.randomize();                                    
         }
 
         function stepsChanged(value)
@@ -174,9 +174,8 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         // PATCHES
         // ------------------------------------------------
     
-        class bdPatch
+        class Patch
         {
-            #bdSynth;
             decay = 50;
             seq = [];
             seqSteps = 16;
@@ -185,8 +184,24 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
             seqPosPrev = -1;
             density = 100;        
 
+            randomize()
+            {
+                this.seq = getSequence(Math.random());
+                this.decay = randInt(1,100);
+                this.seqSteps = randInt(1,16);
+                this.seqMulti = randInt(1,16);
+                this.density = randInt(1,100);      
+                this.setDecay(this.decay);  
+            }
+        }
+
+        class BdPatch extends Patch
+        {
+            #bdSynth;
+
             constructor()
             {                
+                super();
                 this.bdSynth = new Tone.MembraneSynth(
                 {
                     volume: 6,
@@ -196,7 +211,9 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                     }
                 }).toDestination();
 
-                this.setDecay(this.decay);                    
+                this.randomize();
+
+                this.setDecay(this.decay);                              
             }
 
             trigger(time,vel)
@@ -215,19 +232,13 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         }
 
 
-        class hatPatch
+        class HatPatch extends Patch
         {
             #hatSynth;
-            decay = 50;
-            seq = [];
-            seqSteps = 16;
-            seqMulti = 8;
-            seqPos = 0;
-            seqPosPrev = -1;
-            density = 100;        
 
             constructor()
-            {                
+            {           
+                super();     
                 this.hatSynth = new Tone.MetalSynth({
                     harmonicity: 4,
                     resonance: 500,
@@ -237,6 +248,8 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                     },
                     volume: -6
                 }).toDestination();
+
+                this.randomize();
 
                 this.setDecay(this.decay);
             }
@@ -257,20 +270,14 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         }
 
 
-        class snrPatch
+        class SnrPatch extends Patch
         {
             #snrNoiseSynth;
             #snrToneSynth;
-            decay = 50;
-            seq = [];
-            seqSteps = 16;
-            seqMulti = 8;
-            seqPos = 0;
-            seqPosPrev = -1;
-            density = 100;        
 
             constructor()
-            {                
+            {           
+                super();     
                 this.snrNoiseSynth = new Tone.NoiseSynth({
                     noise: {
                         type: "white"
@@ -288,6 +295,8 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                         release: 10
                     }
                 }).toDestination();       
+
+                this.randomize();
 
                 this.setDecay(this.decay);
             }
@@ -318,9 +327,9 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         // SEQUENCING
         // ------------------------------------------------
         
-        var bd = new bdPatch();
-        var hat = new hatPatch(); 
-        var snr = new snrPatch();
+        var bd = new BdPatch();
+        var hat = new HatPatch(); 
+        var snr = new SnrPatch();
 
         regen(); 
 
