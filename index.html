@@ -137,30 +137,30 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
             },100);
 
-            bdSeq = getSequence(0.2);
-            hatSeq = getSequence(0.75);
-            snrSeq = getSequence(0.2);
+            bd.seq = getSequence(0.2);
+            hat.seq = getSequence(0.75);
+            snr.seq = getSequence(0.2);
         }
 
         function stepsChanged(value)
         {                        
-            if (bdSelected) bdSeqSteps=value;
-            if (hatSelected) hatSeqSteps=value;
-            if (snrSelected) snrSeqSteps=value;
+            if (bdSelected)  bd.seqSteps=value;
+            if (hatSelected) hat.seqSteps=value;
+            if (snrSelected) snr.seqSteps=value;
         }
 
         function multiChanged(value)
         {
-            if (bdSelected) bdSeqMulti=value;
-            if (hatSelected) hatSeqMulti=value;
-            if (snrSelected) snrSeqMulti=value;
+            if (bdSelected) bd.seqMulti=value;
+            if (hatSelected) hat.seqMulti=value;
+            if (snrSelected) snr.seqMulti=value;
         }
 
         function densityChanged(value)
         {
-            if (bdSelected) bdDensity=value;
-            if (hatSelected) hatDensity=value;
-            if (snrSelected) snrDensity=value;
+            if (bdSelected) bd.density=value;
+            if (hatSelected) hat.density=value;
+            if (snrSelected) snr.density=value;
         }
 
         function decayChanged(value)
@@ -171,26 +171,32 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         }
 
         // ------------------------------------------------
-        // SYNTHS
+        // PATCHES
         // ------------------------------------------------
     
         class bdPatch
         {
             #bdSynth;
             decay = 50;
+            seq = [];
+            seqSteps = 16;
+            seqMulti = 8;
+            seqPos = 0;
+            seqPosPrev = -1;
+            density = 100;        
 
             constructor()
             {                
                 this.bdSynth = new Tone.MembraneSynth(
-                    {
-                        volume: 6,
-                        octaves: 5,
-                        envelope: {
-                            release: 10
-                        }
-                    }).toDestination();
+                {
+                    volume: 6,
+                    octaves: 5,
+                    envelope: {
+                        release: 10
+                    }
+                }).toDestination();
 
-                    this.setDecay(this.decay);
+                this.setDecay(this.decay);                    
             }
 
             trigger(time,vel)
@@ -213,6 +219,12 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         {
             #hatSynth;
             decay = 50;
+            seq = [];
+            seqSteps = 16;
+            seqMulti = 8;
+            seqPos = 0;
+            seqPosPrev = -1;
+            density = 100;        
 
             constructor()
             {                
@@ -250,6 +262,12 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
             #snrNoiseSynth;
             #snrToneSynth;
             decay = 50;
+            seq = [];
+            seqSteps = 16;
+            seqMulti = 8;
+            seqPos = 0;
+            seqPosPrev = -1;
+            density = 100;        
 
             constructor()
             {                
@@ -300,112 +318,21 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         // SEQUENCING
         // ------------------------------------------------
         
-        //var bdSeq = [1, 0, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 0.25, 0.25, 0, 1, 0];
         var bd = new bdPatch();
-        var bdSeq = [];
-        var bdSeqSteps = 16;
-        var bdSeqMulti = 8;
-        var bdSeqPos = 0;
-        var bdSeqPosPrev = -1;
-        var bdDensity = 100;        
-        var bdDecay = 50;
-
-        //var hatSeq = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0.25, 1, 0, 1, 0.25, 1, 0.25];
-        var hat = new hatPatch();
-        var hatSeq = [];
-        var hatSeqSteps = 16;
-        var hatSeqMulti = 8;
-        var hatSeqPos = 0;
-        var hatSeqPosPrev = -1;
-        var hatDensity = 100;
-        var hatDecay = 50;
- 
-        //var snrSeq = [0, 0, 0, 0, 1, 0, 0, 0.25, 0, 0.25, 0, 0, 1, 0, 0, 0.5];
+        var hat = new hatPatch(); 
         var snr = new snrPatch();
-        var snrSeq = [];
-        var snrSeqSteps = 16;
-        var snrSeqMulti = 8;
-        var snrSeqPos = 0;
-        var snrSeqPosPrev = -1;
-        var snrDensity = 100;        
-        var snrDecay = 50;
 
         regen(); 
 
-        
         const loop = new Tone.Loop((time) => {
                                                  
-            // BD
-            if (bdSeqSteps == 1)  // Special case when step count is 1
-            {
-                bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % 2; // Pretend there are two steps
-                bdSeqPosEffective = 0;                              // But always use the first value
-            }
-            else
-            {
-                bdSeqPos = Math.floor((counter/32)*bdSeqMulti) % bdSeqSteps;
-                bdSeqPosEffective = bdSeqPos;
-            }            
-            if (bdSeqPos != bdSeqPosPrev)
-            {            
-                if (bdSeq[bdSeqPosEffective] > 0 && Math.random() < bdSeq[bdSeqPosEffective]) {
-                    if (Math.random() < bdDensity/100)
-                    {
-                        bd.trigger(time, bdSeq[bdSeqPosEffective]);
-                    }                    
-                }
-            }
-            bdSeqPosPrev = bdSeqPos;
-
-            // HAT
-            if (hatSeqSteps == 1)  // Special case when step count is 1
-            {
-                hatSeqPos = Math.floor((counter/32)*hatSeqMulti) % 2; // Pretend there are two steps
-                hatSeqPosEffective = 0;                              // But always use the first value
-            }
-            else
-            {
-                hatSeqPos = Math.floor((counter/32)*hatSeqMulti) % hatSeqSteps;
-                hatSeqPosEffective = hatSeqPos;
-            }            
-            if (hatSeqPos != hatSeqPosPrev)
-            {            
-                if (hatSeq[hatSeqPosEffective] > 0 && Math.random() < hatSeq[hatSeqPosEffective]) {
-                    if (Math.random() < hatDensity/100)
-                    {
-                        hat.trigger(time, hatSeq[hatSeqPosEffective]);
-                    }                    
-                }
-            }
-            hatSeqPosPrev = hatSeqPos;
-
-            // SNR
-            if (snrSeqSteps == 1)  // Special case when step count is 1
-            {
-                snrSeqPos = Math.floor((counter/32)*snrSeqMulti) % 2; // Pretend there are two steps
-                snrSeqPosEffective = 0;                              // But always use the first value
-            }
-            else
-            {
-                snrSeqPos = Math.floor((counter/32)*snrSeqMulti) % snrSeqSteps;
-                snrSeqPosEffective = snrSeqPos;
-            }            
-            if (snrSeqPos != snrSeqPosPrev)
-            {            
-                if (snrSeq[snrSeqPosEffective] > 0 && Math.random() < snrSeq[snrSeqPosEffective]) {
-                    if (Math.random() < snrDensity/100)
-                    {
-                        snr.trigger(time, snrSeq[snrSeqPosEffective]);
-                    }                    
-                }
-            }
-            snrSeqPosPrev = snrSeqPos;
-
+            executeSequence(bd, time);
+            executeSequence(hat, time);
+            executeSequence(snr, time);
 
             counter++;
 
         }, "64n");
-
   
 
         // ------------------------------------------------
@@ -420,7 +347,6 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         {
             return Math.random() < x;
         }
-
 
         function getSequence(seqDensity)
         {		
@@ -451,6 +377,31 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
 
             return seq;
         }
+
+        function executeSequence(obj, time)
+        {
+            if (obj.seqSteps == 1)  // Special case when step count is 1
+            {
+                obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % 2; // Pretend there are two steps
+                seqPosEffective = 0;                              // But always use the first value
+            }
+            else
+            {
+                obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % obj.seqSteps;
+                seqPosEffective = obj.seqPos;
+            }            
+            if (obj.seqPos != obj.seqPosPrev)
+            {            
+                if (obj.seq[seqPosEffective] > 0 && Math.random() < obj.seq[seqPosEffective]) {
+                    if (Math.random() < obj.density/100)
+                    {
+                        obj.trigger(time, obj.seq[seqPosEffective]);
+                    }                    
+                }
+            }
+            obj.seqPosPrev = obj.seqPos;
+        }
+
 
 	</script>
 </body>
