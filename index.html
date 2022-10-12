@@ -165,9 +165,21 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
 
         function decayChanged(value)
         {
-            if (bdSelected) bd.setDecay(value);
-            if (hatSelected) hat.setDecay(value);
-            if (snrSelected) snr.setDecay(value);
+            if (bdSelected) 
+            {
+                bd.decay = value;
+                bd.update();
+            }
+            if (hatSelected)
+            {
+                hat.decay = value;
+                hat.update();
+            }            
+            if (snrSelected) 
+            {
+                snr.decay = value;
+                snr.update();
+            }
         }
 
         // ------------------------------------------------
@@ -191,43 +203,52 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 this.seqSteps = randInt(1,16);
                 this.seqMulti = randInt(1,16);
                 this.density = randInt(1,100);      
-                this.setDecay(this.decay);  
+                this.decay = randInt(1,100);
+                this.update();
             }
         }
 
         class BdPatch extends Patch
         {
             #bdSynth;
-
+            octaves = 5;    
+            frequency = 60;
+        
             constructor()
             {                
                 super();
-                this.bdSynth = new Tone.MembraneSynth(
+                this.bdSynth = new Tone.MembraneSynth(  // TODO: Do I need to set values here if randomized and updated after?
                 {
                     volume: 6,
-                    octaves: 5,
+                    octaves: this.octaves,
                     envelope: {
                         release: 10
                     }
                 }).toDestination();
 
-                this.randomize();
-
-                this.setDecay(this.decay);                              
+                this.randomize();                                    
             }
 
             trigger(time,vel)
             {
-                this.bdSynth.triggerAttackRelease(60, "16n", time, vel);
+                this.bdSynth.triggerAttackRelease(this.frequency, "16n", time, vel);
             }
 
-            setDecay(value)
+            update()
             {
                 this.bdSynth.set({
-                    envelope: {
-                        decay: 0.01 + Math.pow((value/100),3)
+                    octaves: this.octaves,
+                    envelope: {                        
+                        decay: 0.01 + Math.pow((this.decay/100),3)
                     }
                 });
+            }
+
+            randomize()
+            {                
+                this.frequency = randInt(20,200); 
+                this.octaves = randInt(0,8);
+                super.randomize();
             }
         }
 
@@ -235,14 +256,19 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         class HatPatch extends Patch
         {
             #hatSynth;
+            harmonicity = 4;
+            resonance = 500;
+            modulationIndex = 128;
+            frequency = 1000;
 
             constructor()
             {           
                 super();     
-                this.hatSynth = new Tone.MetalSynth({
+                this.hatSynth = new Tone.MetalSynth({  // TODO: Do I need to set values here if randomized and updated after?
                     harmonicity: 4,
                     resonance: 500,
                     modulationIndex: 128,
+                    frequency: 1000,
                     envelope: {                        
                         release: 10
                     },
@@ -250,22 +276,33 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 }).toDestination();
 
                 this.randomize();
-
-                this.setDecay(this.decay);
             }
 
             trigger(time,vel)
             {
-                this.hatSynth.triggerAttackRelease("C4", "32n", time, vel);
+                this.hatSynth.triggerAttackRelease("C4", "32n", time, vel);  // TODO: How do note and frequency interact?
             }
 
-            setDecay(value)
+            update()
             {
                 this.hatSynth.set({
+                    harmonicity: this.harmonicity,
+                    resonance: this.resonance,
+                    modulationIndex: this.modulationIndex,
+                    frequency: this.frequency,
                     envelope: {
-                        decay: 0.01 + Math.pow((value/100),3),
+                        decay: 0.01 + Math.pow((this.decay/100),3),
                     }
                 });
+            }
+
+            randomize()
+            {                
+                this.harmonicity = randInt(0,128); 
+                this.resonance = randInt(0,10000);
+                this.modulationIndex = randInt(0,256);
+                this.frequency = randInt(0,10000);
+                super.randomize();
             }
         }
 
@@ -274,6 +311,9 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
         {
             #snrNoiseSynth;
             #snrToneSynth;
+            octaves = 1;
+            frequency = 400;
+            noiseType = "white";
 
             constructor()
             {           
@@ -297,28 +337,52 @@ DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninpu
                 }).toDestination();       
 
                 this.randomize();
-
-                this.setDecay(this.decay);
             }
 
             trigger(time,vel)
             {
                 this.snrNoiseSynth.triggerAttackRelease("64n", time, vel); 
-                this.snrToneSynth.triggerAttackRelease(400, "64n", time, vel);      
+                this.snrToneSynth.triggerAttackRelease(this.frequency, "64n", time, vel);      
             }
 
-            setDecay(value)
+            update()
             {
                 this.snrNoiseSynth.set({
+                    noise: {
+                        type: this.noiseType
+                    },
                     envelope: {
-                        decay: 0.01 + Math.pow((value/100),2)*0.3
+                        decay: 0.01 + Math.pow((this.decay/100),2)*0.1
                     }
                 });
                 this.snrToneSynth.set({
+                    octaves: this.octaves,
                     envelope: {
-                        decay: 0.01 + Math.pow((value/100),2)*0.1
+                        decay: 0.01 + Math.pow((this.decay/100),2)*0.1
                     }
                 });
+            }
+
+            randomize()
+            {                
+                this.frequency = randInt(100,1000);                
+                this.octaves = randInt(0,8);
+                if (probDo(0.33))
+                {
+                    this.noiseType = "white";
+                }
+                else
+                {
+                    if (probDo(0.5))
+                    {
+                        this.noiseType = "pink";
+                    }
+                    else
+                    {
+                        this.noiseType = "brown";
+                    }
+                }                                
+                super.randomize();
             }
         }
 
