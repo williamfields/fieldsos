@@ -1,0 +1,88 @@
+body {
+    background-color: #DDDDDD;
+    font-size: 1.5em;
+    font-family: monospace;
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    width: 100%;
+    text-align: center;
+    max-width: 500px;
+}
+
+.buttonContainer { 
+    margin: 25px;
+    white-space: nowrap;
+}
+
+
+.algoSelector {
+    font-family: monospace;
+    font-size: 1em;
+    margin:10px;
+}
+
+.valueDisplay {
+    display: inline-block;
+    width: 40px;
+    margin-left: 10px;    
+}
+
+.sliderContainer {
+    margin-top: 25px;
+    white-space: nowrap;
+}
+
+.slider {
+    width: 100%;
+    max-width:50%;        
+}
+
+input[type=range] {
+    height: 1em;
+    appearance: none;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    height: 25px;
+    width: 15px;
+    background: black;
+    appearance: none;
+  }
+
+.sliderLabel {
+    width: 100px;
+    text-align:right;
+    float:left;
+    margin-right: 10px;
+}
+
+.selector {
+    height: 4em;
+    width: 4em;
+    margin: 2em;
+}
+
+.controlButton {
+    font-size: 85px;
+    border: 0px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.checkboxContainer {
+    width: 320px;
+    margin: 25px auto;
+    text-align: center;
+}
+
+.checkboxSubContainer {
+    float:left;
+}

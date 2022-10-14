@@ -1,601 +1,253 @@
 <!DOCTYPE html>
+
 <html>
-<head>
-  <meta charset="utf-8">
-	<title>FieldsOS</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
-    <style>
-        body 
-        {
-            background-color: #DDDDDD;
-        }
-        .valueDisplay
-        {
-            font-size:1.5em;
-            margin-left:1em;
-        }
-        .slider
-        {
-            width:50%;
-            max-width:400px;
-        }
-        .selector
-        {
-            height:4em;
-            width:4em;
-            margin:2em;        
-        }
-        .selectorLabel
-        {
-            font-size:2em;  
-        }
-        
-    </style>
-</head>
+    <head>
+    <meta charset="utf-8">
+        <title>FieldsOS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
+        <link rel="stylesheet" href="fieldsos.css">
+    </head>
 
-<body>
+    <body>
 
-    <div style="position:absolute; top:50%; transform: translate(-50%, -50%); left:50%; width:80vw; text-align:center;">
-        
-<button id="b" onClick="go();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">▶️</button> <button id="regenButton" onClick="regen();" style="font-size:85px; border:0px; background-color:rgba(0,0,0,0);">🔁</button>
+        <div class="container">
 
-<select onChange="algo = this.options[this.selectedIndex].value;">
-    <option value="random">Totally random</option>
-    <option value="hiphop">Hiphop</option>
-</select>
+            <div class="buttonContainer">
+                <button id="b" class="controlButton" onClick="go();">▶️</button>
+                <button id="regenButton" class="controlButton" onClick="regen();">🔁</button>
+            </div>
 
-<pre>                    
-     TEMPO: <input id="tempoSlider" type="range" class="slider" min="1" max="200" value="120" oninput="document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=String(this.value).padStart(3,' ');"><span id="tempoDisplay"  class="valueDisplay" >120</span>
+            <select class="algoSelector" onChange="algo = this.options[this.selectedIndex].value;">
+                <option value="random">Totally random</option>
+                <option value="hiphop">Hiphop</option>
+            </select>
 
-<hr/>
+            <div class="sliderContainer">
+                <div class="sliderLabel">TEMPO</div>                    
+                <input id="tempoSlider" type="range" class="slider" min="1" max="200" value="120" oninput="document.getElementById('tempoDisplay').innerHTML=this.value;" onchange="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=this.value;"><span id="tempoDisplay"  class="valueDisplay" >120</span>
+            </div>
+            <div class="sliderContainer">
+                <div class="sliderLabel">STEPS</div>
+                <input type="range" class="slider" min="1" max="16" value="16" oninput="document.getElementById('stepsDisplay').innerHTML=this.value;" onchange="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
+            </div>
+            <div class="sliderContainer">
+                <div class="sliderLabel">MULTI</div>
+                <input type="range" class="slider" min="1" max="16" value="8" oninput="document.getElementById('multiDisplay').innerHTML=this.value;" onchange="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
+            </div>
+            <div class="sliderContainer">
+                <div class="sliderLabel">RANDOM</div>
+                <input type="range" class="slider" min="0" max="100" value="0" oninput="document.getElementById('randomnessDisplay').innerHTML=this.value;" onchange="randomnessChanged(this.value);"><span  class="valueDisplay" id="randomnessDisplay">  0</span>
+            </div>
+            <div class="sliderContainer">                
+                <div class="sliderLabel">DENSITY</div>
+                <input type="range" class="slider" min="0" max="100" value="100" oninput="document.getElementById('densityDisplay').innerHTML=this.value;" onchange="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
+            </div>
+            <div class="sliderContainer">
+                <div class="sliderLabel">DECAY</div>
+                <input type="range" class="slider" min="1" max="100" value="50" oninput="document.getElementById('decayDisplay').innerHTML=this.value;" onchange="decayChanged(this.value);"><span  class="valueDisplay" id="decayDisplay"> 50</span>
+            </div>
 
-     STEPS: <input type="range" class="slider" min="1" max="16" value="16" oninput="document.getElementById('stepsDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
+            <div class="checkboxContainer">
+                <div class="checkboxSubContainer">                
+                <div>
+                    <input type="checkbox" class="selector" id="bdSelector" checked="checked" onchange="bdSelected=this.checked;">
+                </div>
+                <div>
+                    <label for="bdSelector">BD</label>
+                </div>
+                </div>
+                <div class="checkboxSubContainer">
+                    <div>
+                        <input type="checkbox" class="selector" id="hatSelector" checked="checked" onchange="hatSelected=this.checked;">
+                    </div>
+                    <div>
+                        <label for="hatSelector">HAT</label>
+                    </div>
+                </div>
+                <div class="checkboxSubContainer">
+                    <div>
+                        <input type="checkbox" class="selector" id="snrSelector" label="SNR" checked="checked" onchange="snrSelected=this.checked;">
+                    </div>
+                    <div>
+                        <label for="snrSelector">SNR</label>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-     MULTI: <input type="range" class="slider" min="1" max="16" value="8" oninput="document.getElementById('multiDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
+        <script type="text/javascript" src="util.js"></script>
+        <script type="text/javascript" src="patches.js"></script>
+        <script type="text/javascript" src="algos.js"></script>
+        <script type="text/javascript">
 
-RANDOMNESS: <input type="range" class="slider" min="0" max="100" value="0" oninput="document.getElementById('randomnessDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="randomnessChanged(this.value);"><span  class="valueDisplay" id="randomnessDisplay">  0</span>
+            // ------------------------------------------------
+            // CONTROLS
+            // ------------------------------------------------
 
-   DENSITY: <input type="range" class="slider" min="0" max="100" value="100" oninput="document.getElementById('densityDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
+            var playing = false;
+            var tempo = 120;
+            var bdSelected = true;
+            var hatSelected = true;
+            var snrSelected = true;
+            var algo = "random";
 
-     DECAY: <input type="range" class="slider" min="1" max="100" value="50" oninput="document.getElementById('decayDisplay').innerHTML=String(this.value).padStart(3,' ');" onchange="decayChanged(this.value);"><span  class="valueDisplay" id="decayDisplay"> 50</span>
-
-</pre>
-
-<div style="width:320px; margin:0 auto; text-align:center;">
-<div style="float:left;">
-    <div>
-        <input type="checkbox" class="selector" id="bdSelector" checked="checked" onchange="bdSelected=this.checked;">
-    </div>
-    <div>
-        <label for="bdSelector" class="selectorLabel">BD</label>
-    </div>
-</div>
-<div style="float:left;">
-    <div>
-        <input type="checkbox" class="selector" id="hatSelector" checked="checked" onchange="hatSelected=this.checked;">
-    </div>
-    <div>
-        <label for="hatSelector" class="selectorLabel">HAT</label>
-    </div>
-</div>
-<div style="float:left;">
-    <div>
-        <input type="checkbox" class="selector" id="snrSelector" label="SNR" checked="checked" onchange="snrSelected=this.checked;">
-    </div>
-    <div>
-        <label for="snrSelector" class="selectorLabel">SNR</label>
-    </div>
-</div>
-<br/>
-</div>
-
-</div>
-
-	<script type="text/javascript">
-
-
-        // ------------------------------------------------
-        // CONFIGURATION
-        // ------------------------------------------------
-
-       VELOCITY_RESPONSE_CURVE = 2;
-
-        // ------------------------------------------------
-        // CONTROLS
-        // ------------------------------------------------
-
-        var playing = false;
-        var tempo = 120;
-        var bdSelected = true;
-        var hatSelected = true;
-        var snrSelected = true;
-        var algo = "random";
-
-        function go()
-        {
-            if (!playing)
+            function go()
             {
-                play();
-                playing = true;
-                document.getElementById("b").innerHTML = '⏸';
-            }                
-            else
-            {
-                stop();
-                playing = false;
-                document.getElementById("b").innerHTML = '▶️';
-            }                
-        }
-
-        function stop()
-        {
-            loop.stop();
-            Tone.Transport.stop();  
-        }
-
-        function play()
-        {                        
-            counter = 0;
-            Tone.Transport.start();                        
-            loop.start(0);
-        }
-
-        function regen()
-        {
-            document.getElementById("regenButton").style.backgroundColor='yellow';
-            setTimeout(()=>{
-                document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
-            },100);
-
-            switch (algo)
-            {
-                case "random": algoRandom(); break;
-                case "hiphop": algoHiphop(); break;
+                if (!playing)
+                {
+                    play();
+                    playing = true;
+                    document.getElementById("b").innerHTML = '⏸';
+                }                
+                else
+                {
+                    stop();
+                    playing = false;
+                    document.getElementById("b").innerHTML = '▶️';
+                }                
             }
-            
-            bd.update();
-            hat.update();
-            snr.update();
-        }
 
-        function stepsChanged(value)
-        {                        
-            if (bdSelected)  bd.seqSteps=value;
-            if (hatSelected) hat.seqSteps=value;
-            if (snrSelected) snr.seqSteps=value;
-        }
-
-        function multiChanged(value)
-        {
-            if (bdSelected) bd.seqMulti=value;
-            if (hatSelected) hat.seqMulti=value;
-            if (snrSelected) snr.seqMulti=value;
-        }
-
-        function densityChanged(value)
-        {
-            if (bdSelected) bd.density=value;
-            if (hatSelected) hat.density=value;
-            if (snrSelected) snr.density=value;
-        }
-
-        function randomnessChanged(value)
-        {
-            if (bdSelected) bd.randomness=value;
-            if (hatSelected) hat.randomness=value;
-            if (snrSelected) snr.randomness=value;
-        }
-
-        function decayChanged(value)
-        {
-            if (bdSelected) 
+            function stop()
             {
-                bd.decay = value;
+                loop.stop();
+                Tone.Transport.stop();  
+            }
+
+            function play()
+            {                        
+                counter = 0;
+                Tone.Transport.start();                        
+                loop.start(0);
+            }
+
+            function regen()
+            {
+                document.getElementById("regenButton").style.backgroundColor='yellow';
+                setTimeout(()=>{
+                    document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
+                },100);
+
+                switch (algo)
+                {
+                    case "random": algoRandom(); break;
+                    case "hiphop": algoHiphop(); break;
+                }
+                
                 bd.update();
-            }
-            if (hatSelected)
-            {
-                hat.decay = value;
                 hat.update();
-            }            
-            if (snrSelected) 
-            {
-                snr.decay = value;
                 snr.update();
             }
-        }
 
-        // ------------------------------------------------
-        // PATCHES
-        // ------------------------------------------------
+            function stepsChanged(value)
+            {                        
+                if (bdSelected)  bd.seqSteps=value;
+                if (hatSelected) hat.seqSteps=value;
+                if (snrSelected) snr.seqSteps=value;
+            }
+
+            function multiChanged(value)
+            {
+                if (bdSelected) bd.seqMulti=value;
+                if (hatSelected) hat.seqMulti=value;
+                if (snrSelected) snr.seqMulti=value;
+            }
+
+            function densityChanged(value)
+            {
+                if (bdSelected) bd.density=value;
+                if (hatSelected) hat.density=value;
+                if (snrSelected) snr.density=value;
+            }
+
+            function randomnessChanged(value)
+            {
+                if (bdSelected) bd.randomness=value;
+                if (hatSelected) hat.randomness=value;
+                if (snrSelected) snr.randomness=value;
+            }
+
+            function decayChanged(value)
+            {
+                if (bdSelected) 
+                {
+                    bd.decay = value;
+                    bd.update();
+                }
+                if (hatSelected)
+                {
+                    hat.decay = value;
+                    hat.update();
+                }            
+                if (snrSelected) 
+                {
+                    snr.decay = value;
+                    snr.update();
+                }
+            }
+
+            // ------------------------------------------------
+            // SEQUENCING
+            // ------------------------------------------------
+            
+            var bd = new BdPatch();
+            var hat = new HatPatch(); 
+            var snr = new SnrPatch();
+
+            const loop = new Tone.Loop((time) => {
+                                                    
+                executeSequence(bd, time);
+                executeSequence(hat, time);
+                executeSequence(snr, time);
+
+                counter++;
+
+            }, "64n");
     
-        class Patch
-        {
-            decay;
-            seq;
-            seqSteps;
-            seqMulti;
-            seqPos;
-            seqPosPrev;
-            density;        
-            randomness;
 
-            constructor()
+            function executeSequence(obj, time)
             {
-                this.seq = [];                
-                this.decay = 50;
-                this.seqSteps = 16;
-                this.seqPos = 0;
-                this.seqPosPrev = -1;
-                this.seqMulti = 8;
-                this.density = 100;      
-                this.randomness = 0;
-            }
-        }
-
-        class BdPatch extends Patch
-        {
-            bdSynth;
-            octaves;    
-            frequency;
-        
-            constructor()
-            {                
-                super();
-                this.seq = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0];
-                this.frequency = 50;
-                this.octaves = 4;
-                this.bdSynth = new Tone.MembraneSynth().toDestination();
-                this.update();                                    
-            }
-
-            trigger(time,vel)
-            {
-                vel = Math.pow(vel,VELOCITY_RESPONSE_CURVE);
-                this.bdSynth.triggerAttackRelease(this.frequency, "16n", time, vel);
-            }
-
-            update()
-            {
-                this.bdSynth.set({
-                    volume: 0,
-                    octaves: this.octaves,
-                    envelope: {                        
-                        decay: Math.pow((this.decay/100),3),
-                        release: 10
-                    }
-                });
-            }
-        }
-
-
-        class HatPatch extends Patch
-        {
-            hatSynth;
-            harmonicity;
-            resonance;
-            modulationIndex;
-            frequency;
-
-            constructor()
-            {           
-                super();     
-                this.seq = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0];
-                this.harmonicity = 4; 
-                this.resonance = 1000;
-                this.modulationIndex = 32;
-                this.frequency = 1000;
-                this.hatSynth = new Tone.MetalSynth().toDestination();
-                this.update();
-            }
-
-            trigger(time,vel)
-            {
-                vel = Math.pow(vel,VELOCITY_RESPONSE_CURVE);
-                this.hatSynth.triggerAttackRelease("C4", "32n", time, vel);  // TODO: How do note and frequency interact?
-            }
-
-            update()
-            {
-                this.hatSynth.set({
-                    volume: -12,
-                    harmonicity: this.harmonicity,
-                    resonance: this.resonance,
-                    modulationIndex: this.modulationIndex,
-                    frequency: this.frequency,
-                    envelope: {
-                        decay: Math.pow((this.decay/100),3),
-                        release: 10
-                    }
-                });
-            }
-        }
-
-
-        class SnrPatch extends Patch
-        {
-            snrNoiseSynth;
-            snrToneSynth;
-            octaves;
-            frequency;
-            noiseType;
-
-            constructor()
-            {           
-                super();
-                this.seq = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0];
-                this.frequency = 200;
-                this.octaves = 2;
-                this.noiseType = "white";
-                this.snrNoiseSynth = new Tone.NoiseSynth().toDestination();
-                this.snrToneSynth = new Tone.MembraneSynth().toDestination();       
-                this.update();
-            }
-
-            trigger(time,vel)
-            {
-                vel = Math.pow(vel,VELOCITY_RESPONSE_CURVE);
-                this.snrNoiseSynth.triggerAttackRelease("64n", time, vel); 
-                this.snrToneSynth.triggerAttackRelease(this.frequency, "64n", time, vel);      
-            }
-
-            update()
-            {
-                this.snrNoiseSynth.set({
-                    volume: 0,
-                    noise: {
-                        type: this.noiseType
-                    },
-                    envelope: {
-                        decay: Math.pow((this.decay/100),2)*0.1,
-                        release: 10
-                    }
-                });
-                this.snrToneSynth.set({
-                    volume: -6,
-                    octaves: this.octaves,
-                    envelope: {
-                        decay: Math.pow((this.decay/100),4)*0.1,
-                        release: 10
-                    }
-                });
-            }
-        }
-
-        var bd = new BdPatch();
-        var hat = new HatPatch(); 
-        var snr = new SnrPatch();
-
-
-        // ------------------------------------------------
-        // SEQUENCING
-        // ------------------------------------------------
-                
-        const loop = new Tone.Loop((time) => {
-                                                 
-            executeSequence(bd, time);
-            executeSequence(hat, time);
-            executeSequence(snr, time);
-
-            counter++;
-
-        }, "64n");
-  
-
-        // ------------------------------------------------
-        // ALGORITHMS
-        // ------------------------------------------------
-
-        function algoRandom()
-        {
-            tempo = randInt(1,200);
-            document.getElementById("tempoSlider").value = tempo;
-            document.getElementById("tempoDisplay").innerHTML = String(tempo).padStart(3,' ');
-
-            bd.seq = getTunedSequence();
-            hat.seq = getTunedSequence();
-            snr.seq = getTunedSequence();
-
-            bd.seqSteps = randInt(1,16);
-            hat.seqSteps = randInt(1,16);
-            snr.seqSteps = randInt(1,16);
-
-            bd.seqMulti = randInt(1,16);
-            hat.seqMulti = randInt(1,16);
-            snr.seqMulti = randInt(1,16);
-
-            bd.decay = randInt(1,100);
-            hat.decay = randInt(1,100);
-            snr.decay = randInt(1,100);
-
-            bd.density = randInt(0,100);
-            hat.density = randInt(0,100);
-            snr.density = randInt(0,100);
-
-            bd.randomness = randInt(0,100);
-            hat.randomness = randInt(0,100);
-            snr.randomness = randInt(0,100);
-
-            bd.frequency = randInt(20,200); 
-            bd.octaves = randInt(0,8);
-
-            hat.harmonicity = randInt(0,128); 
-            hat.resonance = randInt(0,10000);
-            hat.modulationIndex = randInt(0,256);
-            hat.frequency = randInt(0,10000);
-                
-            snr.frequency = 100+Math.pow(Math.random(),2)*1000;
-            snr.octaves = Math.pow(Math.random(),2)*8;
-            if (probDo(0.33))
-            {
-                snr.noiseType = "white";
-            }
-            else
-            {
-                if (probDo(0.5))
+                if (obj.seqSteps == 1)  // Special case when step count is 1
                 {
-                    snr.noiseType = "pink";
+                    obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % 2; // Pretend there are two steps
+                    seqPosEffective = 0;                              // But always use the first value
                 }
                 else
                 {
-                    snr.noiseType = "brown";
-                }
-            }                                
-        }
-
-
-        function algoHiphop()
-        {
-            algoRandom();
-
-            tempo = randInt(70,120);
-            document.getElementById("tempoSlider").value = tempo;
-            document.getElementById("tempoDisplay").innerHTML = String(tempo).padStart(3,' ');
-	
-            // BD always on the 1
-            for (var i=0;i<16;i++)
-            {
-                bd.seq[i] = probDo(0.25) ? rand() : 0;
-            }		
-            bd.seq[0] = 1;
-
-            // SNR always on the 2 and 4
-            for (var i=0;i<16;i++)
-            {
-                snr.seq[i] = probDo(0.25) ? Math.pow(rand(),2) : 0;
-            }		
-            snr.seq[4] = 1;
-            snr.seq[12] = 1;
-
-
-            hat.seqSteps = 16;
-
-            // Constant hi-hats
-            if (probDo(0.5))
-            {
-                hat.seqSteps = 1;			
-                hat.seq[0] = 1;
-            }
-
-            bd.seqSteps = 16;            
-            snr.seqSteps = 16;
-
-            bd.seqMulti = 4;
-            hat.seqMulti = probDo(0.5) ? 4 : 8;
-            if (probDo(0.25)) // Sometimes do triplet hats
-            {
-                hat.seqMulti = 6;
-            }            
-            snr.seqMulti = 4;
-
-            bd.decay = Math.pow(Math.random(),0.5)*100;
-            hat.decay = Math.pow(Math.random(),2)*100;
-            snr.decay = Math.pow(Math.random(),0.5)*100;
-
-            bd.density = 100;
-            hat.density = 100;
-            snr.density = 100;
-
-            bd.randomness = randInt(0,25);
-            hat.randomness = randInt(0,25);
-            snr.randomness = randInt(0,25);
-
-            bd.frequency = randInt(20,100); 
-            bd.octaves = randInt(0,4);
-        }
-
-
-        // ------------------------------------------------
-        // HELPERS
-        // ------------------------------------------------
-         
-        function rand(min, max) 
-        {	
-            if (typeof min === "undefined" || typeof max === "undefined")
-            {
-                min = 0;
-                max = 1;
-            }
-
-            return Math.random() * (max - min) + min;	
-        }
-
-        function randInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function probDo(x) 
-        {
-            return Math.random() < x;
-        }
-
-        function getTunedSequence(steps=16)
-        {
-            var seq = [];
-            for (var i=0;i<steps;i++)
-            {
-                var f = 0;
-                var r = rand();
-                if (r < 0.1)
-                {
-                    f = 1;
-                }
-                else if (r < 0.8)
-                {
-                    f = 0;
-                }
-                else
-                {
-                    f = rand();
-                }
-                seq[i] = f;
-            }
-            return seq;
-        }
-
-        function executeSequence(obj, time)
-        {
-            if (obj.seqSteps == 1)  // Special case when step count is 1
-            {
-                obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % 2; // Pretend there are two steps
-                seqPosEffective = 0;                              // But always use the first value
-            }
-            else
-            {
-                obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % obj.seqSteps;
-                seqPosEffective = obj.seqPos;
-            }            
-            if (obj.seqPos != obj.seqPosPrev)
-            {                   
-                if (probDo(obj.randomness/100))  // Do something random
-                {
-                    if (probDo(0.5))  // Sometimes trigger, sometimes not
+                    obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % obj.seqSteps;
+                    seqPosEffective = obj.seqPos;
+                }            
+                if (obj.seqPos != obj.seqPosPrev)
+                {                   
+                    if (probDo(obj.randomness/100))  // Do something random
                     {
-                        if (probDo(0.5))
+                        if (probDo(0.5))  // Sometimes trigger, sometimes not
                         {
-                            obj.trigger(time, 1);  // Full velocity trigger
-                        }
-                        else
-                        {                            
-                            obj.trigger(time, 0.75);  // Quiet trigger
-                        }
-                    } 
-                }
-                else  // Follow the actual sequence
-                {
-                    if (obj.seq[seqPosEffective] > 0) // && probDo(obj.seq[seqPosEffective]))
+                            if (probDo(0.5))
+                            {
+                                obj.trigger(time, 1);  // Full velocity trigger
+                            }
+                            else
+                            {                            
+                                obj.trigger(time, 0.75);  // Quiet trigger
+                            }
+                        } 
+                    }
+                    else  // Follow the actual sequence
                     {
-                        if (probDo(obj.density/100))
+                        if (obj.seq[seqPosEffective] > 0) // && probDo(obj.seq[seqPosEffective]))
                         {
-                            obj.trigger(time, obj.seq[seqPosEffective]);
-                        }                    
+                            if (probDo(obj.density/100))
+                            {
+                                obj.trigger(time, obj.seq[seqPosEffective]);
+                            }                    
+                        }
                     }
                 }
+                obj.seqPosPrev = obj.seqPos;
             }
-            obj.seqPosPrev = obj.seqPos;
-        }
 
-	</script>
-</body>
+        </script>
+    </body>
+
 </html>
