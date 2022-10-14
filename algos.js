@@ -1,10 +1,6 @@
 
 function algoRandom()
 {
-    Tone.Transport.bpm.value = tempo = randInt(70,120);
-    document.getElementById("tempoSlider").value = tempo;
-    document.getElementById("tempoDisplay").innerHTML = tempo;
-
     bd.seq = getTunedSequence();
     hat.seq = getTunedSequence();
     snr.seq = getTunedSequence();
@@ -61,11 +57,6 @@ function algoHiphop()
 {
     algoRandom();
 
-    Tone.Transport.bpm.value = tempo = randInt(70,120);
-    document.getElementById("tempoSlider").value = tempo;
-    document.getElementById("tempoDisplay").innerHTML = tempo;
-
-    // BD always on the 1
     for (var i=0;i<16;i++)
     {
         bd.seq[i] = probDo(0.25) ? rand() : 0;
@@ -79,7 +70,6 @@ function algoHiphop()
     }		
     snr.seq[4] = 1;
     snr.seq[12] = 1;
-
 
     hat.seqSteps = 16;
 
@@ -115,4 +105,31 @@ function algoHiphop()
 
     bd.frequency = randInt(20,100); 
     bd.octaves = randInt(0,4);
+}
+
+
+function algoTechno()
+{
+    algoRandom();
+
+    bd.seq = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0];
+    bd.seqSteps = 16;            
+    bd.seqMulti = 8;
+    bd.randomness = randInt(0,25);
+    bd.density = 100;
+    
+    hat.seqSteps = 16;    
+    if (probDo(0.5))  // Constant hi-hats
+    {
+        hat.seqSteps = 1;			
+        hat.seq[0] = 1;
+    }
+    hat.seqMulti = probDo(0.5) ? 4 : 8;
+    hat.density = 100;
+    hat.randomness = randInt(0,25);
+
+    snr.seqSteps = 16;        
+    snr.seqMulti = probDo(0.5) ? 4 : 8;
+    snr.density = 100;    
+    snr.randomness = randInt(0,25);
 }

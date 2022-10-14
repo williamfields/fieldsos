@@ -31,14 +31,14 @@ class BdPatch extends Patch
     octaves;    
     frequency;
 
-    constructor()
+    constructor(output)
     {                
         super();
         this.seq = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0];
         this.frequency = 50;
         this.octaves = 4;
-        this.bdSynth = new Tone.MembraneSynth().toDestination();
-        this.update();                                    
+        this.bdSynth = new Tone.MembraneSynth().connect(output);
+        this.update();                                            
     }
 
     trigger(time,vel)
@@ -69,7 +69,7 @@ class HatPatch extends Patch
     modulationIndex;
     frequency;
 
-    constructor()
+    constructor(output)
     {           
         super();     
         this.seq = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0];
@@ -77,7 +77,7 @@ class HatPatch extends Patch
         this.resonance = 1000;
         this.modulationIndex = 32;
         this.frequency = 1000;
-        this.hatSynth = new Tone.MetalSynth().toDestination();
+        this.hatSynth = new Tone.MetalSynth().connect(output);
         this.update();
     }
 
@@ -112,15 +112,15 @@ class SnrPatch extends Patch
     frequency;
     noiseType;
 
-    constructor()
+    constructor(output)
     {           
         super();
         this.seq = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0];
         this.frequency = 200;
         this.octaves = 2;
         this.noiseType = "white";
-        this.snrNoiseSynth = new Tone.NoiseSynth().toDestination();
-        this.snrToneSynth = new Tone.MembraneSynth().toDestination();       
+        this.snrNoiseSynth = new Tone.NoiseSynth().connect(output);
+        this.snrToneSynth = new Tone.MembraneSynth().connect(output);
         this.update();
     }
 

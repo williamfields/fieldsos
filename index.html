@@ -5,7 +5,7 @@
     <meta charset="utf-8">
         <title>FieldsOS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
+        <script src="http://unpkg.com/tone"></script>
         <link rel="stylesheet" href="fieldsos.css">
     </head>
 
@@ -22,6 +22,7 @@
             <select class="algoSelector" onChange="algo = this.options[this.selectedIndex].value;">
                 <option value="random">Random</option>
                 <option value="hiphop">Hiphop</option>
+                <option value="techno">Techno</option>
             </select>
 
             <div class="sliderContainer">
@@ -126,13 +127,14 @@
             {
                 document.getElementById("regenButton").style.backgroundColor='yellow';
                 setTimeout(()=>{
-                    document.getElementById("regenButton").style.backgroundColor='#DDDDDD';
+                    document.getElementById("regenButton").style.backgroundColor='lightcoral';
                 },100);
 
                 switch (algo)
                 {
                     case "random": algoRandom(); break;
                     case "hiphop": algoHiphop(); break;
+                    case "techno": algoTechno(); break;
                 }
                 
                 bd.update();
@@ -199,15 +201,32 @@
             }
 
             // ------------------------------------------------
+            // FX
+            // ------------------------------------------------
+            
+            const reverb = new Tone.Freeverb({
+                roomSize: 0.1,
+                //dampening: 4000,
+                wet: 0.1
+            }).toDestination();
+        
+            
+            // ------------------------------------------------
+            // SYNTHS
+            // ------------------------------------------------
+
+            var bd = new BdPatch(reverb);
+            var hat = new HatPatch(reverb); 
+            var snr = new SnrPatch(reverb);
+
+
+            // ------------------------------------------------
             // SEQUENCING
             // ------------------------------------------------
             
-            var bd = new BdPatch();
-            var hat = new HatPatch(); 
-            var snr = new SnrPatch();
-
             const loop = new Tone.Loop((time) => {
-                                                    
+             
+
                 executeSequence(bd, time);
                 executeSequence(hat, time);
                 executeSequence(snr, time);
@@ -216,7 +235,6 @@
 
             }, "64n");
     
-
             function executeSequence(obj, time)
             {
                 if (obj.seqSteps == 1)  // Special case when step count is 1
@@ -231,22 +249,31 @@
                 }            
                 if (obj.seqPos != obj.seqPosPrev)
                 {                   
-                    if (obj.seq[seqPosEffective] > 0) // If something scheduled, do it
+                    if (probDo(obj.density/100))
                     {
-                        if (probDo(obj.density/100))
+                        if (obj.seq[seqPosEffective] > 0) // If something scheduled, do it
                         {
                             obj.trigger(time, obj.seq[seqPosEffective]);
-                        }                    
-                    }
-                    else if (probDo(obj.randomness/100))  // otherwise, sometimes do something random
-                    {
-                        if (probDo(0.5))
-                        {
-                            obj.trigger(time, 1);  // Full velocity trigger
                         }
-                        else
-                        {                            
-                            obj.trigger(time, 0.75);  // Quiet trigger
+                        else if (probDo(obj.randomness/100))  // otherwise, sometimes do something random
+                        {
+                            if (probDo(0.5))
+                            {
+                                obj.trigger(time, 1);  // Full velocity trigger
+                            }
+                            else
+                            {                            
+                                obj.trigger(time, 0.75);  // Quiet trigger
+                                                            
+                                // Roll
+                                /*
+                                obj.trigger(time, 1);
+                                obj.trigger(time + (6/tempo)*1, 0.75);
+                                obj.trigger(time + (6/tempo)*2, 0.5);
+                                obj.trigger(time + (6/tempo)*3., 0.75);
+                                obj.trigger(time + (6/tempo)*4, 1);
+                                */
+                            }
                         }
                     }
                 }
