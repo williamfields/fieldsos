@@ -83,13 +83,13 @@ function algoHiphop()
     bd.seqSteps = 16;            
     snr.seqSteps = 16;
 
-    bd.seqMulti = 4;
+    bd.seqMulti = 8;
     hat.seqMulti = probDo(0.5) ? 4 : 8;
     if (probDo(0.25)) // Sometimes do triplet hats
     {
-        hat.seqMulti = 6;
+        hat.seqMulti = 12;
     }            
-    snr.seqMulti = 4;
+    snr.seqMulti = 8;
 
     bd.decay = Math.pow(Math.random(),0.5)*100;
     hat.decay = Math.pow(Math.random(),2)*100;
