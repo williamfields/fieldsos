@@ -1,5 +1,9 @@
+:root {
+    --bgcolor: rgb(135, 158, 187);
+  }
+
 body {
-    background-color: lightcoral;
+    background-color: var(--bgcolor);
     font-size: 1.5em;
     font-family: monospace;
 }
@@ -24,6 +28,9 @@ body {
     font-family: monospace;
     font-size: 1em;
     margin:10px;
+    background-color: rgba(0, 0, 0, 0);
+    border: 2px solid black;
+    padding:5px; 
 }
 
 .valueDisplay {
@@ -58,6 +65,11 @@ input[type=range]::-webkit-slider-thumb {
     appearance: none;
   }
 
+  input[type=range]::-webkit-slider-runnable-track {
+    background: var(--bgcolor);
+    border: 2px solid #000000;
+  }
+
 .sliderLabel {
     width: 100px;
     text-align:right;
@@ -69,14 +81,15 @@ input[type=range]::-webkit-slider-thumb {
     height: 4em;
     width: 4em;
     margin: 2em;
+    background-color: rgba(0, 0, 0, 0);    
 }
 
 .controlButton {
-    font-size: 85px;
-    border: 0px;
+    font-family:monospace;
+    font-size: 50px;
     background-color: rgba(0, 0, 0, 0);
-    margin:0px;
-    padding:0px;
+    margin: 0px 10px;
+    padding: 10px 25px;
 }
 
 .checkboxContainer {

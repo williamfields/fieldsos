@@ -12,10 +12,10 @@
     <body>
 
         <div class="container">
-            FieldsOS
+            <b>FieldsOS</b>
             <div class="buttonContainer">
-                <button id="b" class="controlButton" onClick="go();">▶️</button>
-                <button id="regenButton" class="controlButton" onClick="regen();">🔁</button>
+                <button id="b" class="controlButton" onClick="go();">&gt;</button>
+                <button id="regenButton" class="controlButton" onClick="regen();">?</button>
             </div>
 
             Algorithm:
@@ -100,13 +100,13 @@
                 {
                     play();
                     playing = true;
-                    document.getElementById("b").innerHTML = '⏸';
+                    document.getElementById("b").innerHTML = '=';
                 }                
                 else
                 {
                     stop();
                     playing = false;
-                    document.getElementById("b").innerHTML = '▶️';
+                    document.getElementById("b").innerHTML = '&gt';
                 }                
             }
 
@@ -125,9 +125,9 @@
 
             function regen()
             {
-                document.getElementById("regenButton").style.backgroundColor='yellow';
+                document.getElementById("regenButton").innerHTML = "!";
                 setTimeout(()=>{
-                    document.getElementById("regenButton").style.backgroundColor='lightcoral';
+                    document.getElementById("regenButton").innerHTML = "?";
                 },100);
 
                 switch (algo)
