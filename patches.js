@@ -54,7 +54,7 @@ class BdPatch extends Patch
             octaves: this.octaves,
             envelope: {                        
                 decay: Math.pow((this.decay/100),3),
-                release: 10
+                release: (this.decay/100)*10
             }
         });
     }
@@ -97,7 +97,7 @@ class HatPatch extends Patch
             frequency: this.frequency,
             envelope: {
                 decay: Math.pow((this.decay/100),3),
-                release: 10
+                release: (this.decay/100)*10
             }
         });
     }
@@ -140,7 +140,7 @@ class SnrPatch extends Patch
             },
             envelope: {
                 decay: Math.pow((this.decay/100),2)*0.1,
-                release: 10
+                release: (this.decay/100)*10
             }
         });
         this.snrToneSynth.set({
@@ -148,7 +148,7 @@ class SnrPatch extends Patch
             octaves: this.octaves,
             envelope: {
                 decay: Math.pow((this.decay/100),4)*0.1,
-                release: 10
+                release: (this.decay/100)*10
             }
         });
     }
