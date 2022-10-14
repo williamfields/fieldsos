@@ -12,40 +12,41 @@
     <body>
 
         <div class="container">
-
+            FieldsOS
             <div class="buttonContainer">
                 <button id="b" class="controlButton" onClick="go();">▶️</button>
                 <button id="regenButton" class="controlButton" onClick="regen();">🔁</button>
             </div>
 
+            Algorithm:
             <select class="algoSelector" onChange="algo = this.options[this.selectedIndex].value;">
-                <option value="random">Totally random</option>
+                <option value="random">Random</option>
                 <option value="hiphop">Hiphop</option>
             </select>
 
             <div class="sliderContainer">
                 <div class="sliderLabel">TEMPO</div>                    
-                <input id="tempoSlider" type="range" class="slider" min="1" max="200" value="120" oninput="document.getElementById('tempoDisplay').innerHTML=this.value;" onchange="Tone.Transport.bpm.value=tempo=this.value; document.getElementById('tempoDisplay').innerHTML=this.value;"><span id="tempoDisplay"  class="valueDisplay" >120</span>
+                <input id="tempoSlider" type="range" class="slider" min="1" max="200" value="120" oninput="tempoChanged(this.value);"><span id="tempoDisplay"  class="valueDisplay" >120</span>
             </div>
             <div class="sliderContainer">
                 <div class="sliderLabel">STEPS</div>
-                <input type="range" class="slider" min="1" max="16" value="16" oninput="document.getElementById('stepsDisplay').innerHTML=this.value;" onchange="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
+                <input type="range" class="slider" min="1" max="16" value="16" oninput="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
             </div>
             <div class="sliderContainer">
                 <div class="sliderLabel">MULTI</div>
-                <input type="range" class="slider" min="1" max="16" value="8" oninput="document.getElementById('multiDisplay').innerHTML=this.value;" onchange="multiChanged(this.value);"><span  class="valueDisplay" id="multiDisplay">  8</span>
+                <input type="range" class="slider" min="1" max="16" value="8" oninput="multiChanged(this.value);"><span class="valueDisplay" id="multiDisplay">  8</span>
             </div>
             <div class="sliderContainer">
                 <div class="sliderLabel">RANDOM</div>
-                <input type="range" class="slider" min="0" max="100" value="0" oninput="document.getElementById('randomnessDisplay').innerHTML=this.value;" onchange="randomnessChanged(this.value);"><span  class="valueDisplay" id="randomnessDisplay">  0</span>
+                <input type="range" class="slider" min="0" max="100" value="0" oninput="randomnessChanged(this.value);"><span class="valueDisplay" id="randomnessDisplay">  0</span>
             </div>
             <div class="sliderContainer">                
                 <div class="sliderLabel">DENSITY</div>
-                <input type="range" class="slider" min="0" max="100" value="100" oninput="document.getElementById('densityDisplay').innerHTML=this.value;" onchange="densityChanged(this.value);"><span  class="valueDisplay" id="densityDisplay">100</span>
+                <input type="range" class="slider" min="0" max="100" value="100" oninput="densityChanged(this.value);"><span class="valueDisplay" id="densityDisplay">100</span>
             </div>
             <div class="sliderContainer">
                 <div class="sliderLabel">DECAY</div>
-                <input type="range" class="slider" min="1" max="100" value="50" oninput="document.getElementById('decayDisplay').innerHTML=this.value;" onchange="decayChanged(this.value);"><span  class="valueDisplay" id="decayDisplay"> 50</span>
+                <input type="range" class="slider" min="1" max="100" value="50" oninput="decayChanged(this.value);"><span class="valueDisplay" id="decayDisplay"> 50</span>
             </div>
 
             <div class="checkboxContainer">
@@ -139,8 +140,15 @@
                 snr.update();
             }
 
+            function tempoChanged(value)
+            {
+                document.getElementById('tempoDisplay').innerHTML=value;
+                Tone.Transport.bpm.value=tempo=value;
+            }
+
             function stepsChanged(value)
             {                        
+                document.getElementById('stepsDisplay').innerHTML=value;
                 if (bdSelected)  bd.seqSteps=value;
                 if (hatSelected) hat.seqSteps=value;
                 if (snrSelected) snr.seqSteps=value;
@@ -148,6 +156,7 @@
 
             function multiChanged(value)
             {
+                document.getElementById('multiDisplay').innerHTML=value;
                 if (bdSelected) bd.seqMulti=value;
                 if (hatSelected) hat.seqMulti=value;
                 if (snrSelected) snr.seqMulti=value;
@@ -155,6 +164,7 @@
 
             function densityChanged(value)
             {
+                document.getElementById('densityDisplay').innerHTML=value;
                 if (bdSelected) bd.density=value;
                 if (hatSelected) hat.density=value;
                 if (snrSelected) snr.density=value;
@@ -162,6 +172,7 @@
 
             function randomnessChanged(value)
             {
+                document.getElementById('randomnessDisplay').innerHTML=value;
                 if (bdSelected) bd.randomness=value;
                 if (hatSelected) hat.randomness=value;
                 if (snrSelected) snr.randomness=value;
@@ -169,6 +180,7 @@
 
             function decayChanged(value)
             {
+                document.getElementById('decayDisplay').innerHTML=value;
                 if (bdSelected) 
                 {
                     bd.decay = value;
@@ -219,28 +231,22 @@
                 }            
                 if (obj.seqPos != obj.seqPosPrev)
                 {                   
-                    if (probDo(obj.randomness/100))  // Do something random
+                    if (obj.seq[seqPosEffective] > 0) // If something scheduled, do it
                     {
-                        if (probDo(0.5))  // Sometimes trigger, sometimes not
+                        if (probDo(obj.density/100))
                         {
-                            if (probDo(0.5))
-                            {
-                                obj.trigger(time, 1);  // Full velocity trigger
-                            }
-                            else
-                            {                            
-                                obj.trigger(time, 0.75);  // Quiet trigger
-                            }
-                        } 
+                            obj.trigger(time, obj.seq[seqPosEffective]);
+                        }                    
                     }
-                    else  // Follow the actual sequence
+                    else if (probDo(obj.randomness/100))  // otherwise, sometimes do something random
                     {
-                        if (obj.seq[seqPosEffective] > 0) // && probDo(obj.seq[seqPosEffective]))
+                        if (probDo(0.5))
                         {
-                            if (probDo(obj.density/100))
-                            {
-                                obj.trigger(time, obj.seq[seqPosEffective]);
-                            }                    
+                            obj.trigger(time, 1);  // Full velocity trigger
+                        }
+                        else
+                        {                            
+                            obj.trigger(time, 0.75);  // Quiet trigger
                         }
                     }
                 }

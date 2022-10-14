@@ -148,7 +148,7 @@ class SnrPatch extends Patch
             octaves: this.octaves,
             envelope: {
                 decay: Math.pow((this.decay/100),4)*0.1,
-                release: (this.decay/100)*10
+                release: (this.decay/100)*5
             }
         });
     }

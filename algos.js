@@ -1,9 +1,9 @@
 
 function algoRandom()
 {
-    tempo = randInt(1,200);
+    Tone.Transport.bpm.value = tempo = randInt(70,120);
     document.getElementById("tempoSlider").value = tempo;
-    document.getElementById("tempoDisplay").innerHTML = String(tempo).padStart(3,' ');
+    document.getElementById("tempoDisplay").innerHTML = tempo;
 
     bd.seq = getTunedSequence();
     hat.seq = getTunedSequence();
@@ -61,9 +61,9 @@ function algoHiphop()
 {
     algoRandom();
 
-    tempo = randInt(70,120);
+    Tone.Transport.bpm.value = tempo = randInt(70,120);
     document.getElementById("tempoSlider").value = tempo;
-    document.getElementById("tempoDisplay").innerHTML = String(tempo).padStart(3,' ');
+    document.getElementById("tempoDisplay").innerHTML = tempo;
 
     // BD always on the 1
     for (var i=0;i<16;i++)
