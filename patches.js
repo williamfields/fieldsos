@@ -30,6 +30,7 @@ class BdPatch extends Patch
     bdSynth;
     octaves;    
     frequency;
+    pitchDecay;
 
     constructor(output)
     {                
@@ -37,6 +38,7 @@ class BdPatch extends Patch
         this.seq = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0];
         this.frequency = 50;
         this.octaves = 4;
+        this.pitchDecay = 26;
         this.bdSynth = new Tone.MembraneSynth().connect(output);
         this.update();                                            
     }
@@ -52,6 +54,7 @@ class BdPatch extends Patch
         this.bdSynth.set({
             volume: 0,
             octaves: this.octaves,
+            pitchDecay: this.pitchDecay/100,
             envelope: {                        
                 decay: Math.pow((this.decay/100),3),
                 release: (this.decay/100)*10
@@ -111,6 +114,7 @@ class SnrPatch extends Patch
     octaves;
     frequency;
     noiseType;
+    pitchDecay;
 
     constructor(output)
     {           
@@ -121,6 +125,7 @@ class SnrPatch extends Patch
         this.noiseType = "white";
         this.snrNoiseSynth = new Tone.NoiseSynth().connect(output);
         this.snrToneSynth = new Tone.MembraneSynth().connect(output);
+        this.pitchDecay = 25;
         this.update();
     }
 
@@ -146,6 +151,7 @@ class SnrPatch extends Patch
         this.snrToneSynth.set({
             volume: -6,
             octaves: this.octaves,
+            pitchDecay: this.pitchDecay/100,
             envelope: {
                 decay: Math.pow((this.decay/100),4)*0.1,
                 release: (this.decay/100)*5

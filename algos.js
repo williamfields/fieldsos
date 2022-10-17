@@ -27,13 +27,15 @@ function algoRandom()
 
     bd.frequency = randInt(20,200); 
     bd.octaves = randInt(0,8);
+    bd.pitchDecay = randInt(0,100);
+    snr.pitchDecay = randInt(0,100);
 
     hat.harmonicity = randInt(0,128); 
     hat.resonance = randInt(0,10000);
     hat.modulationIndex = randInt(0,256);
     hat.frequency = randInt(0,10000);
         
-    snr.frequency = 100+Math.pow(Math.random(),2)*1000;
+    snr.frequency = 100+Math.pow(Math.random(),2)*1000;    
     snr.octaves = Math.pow(Math.random(),2)*8;
     if (probDo(0.33))
     {
@@ -105,6 +107,8 @@ function algoHiphop()
 
     bd.frequency = randInt(20,100); 
     bd.octaves = randInt(0,4);
+    bd.pitchDecay = randInt(0,100);
+    snr.pitchDecay = randInt(0,100);
 }
 
 
@@ -117,6 +121,8 @@ function algoTechno()
     bd.multi = 8;
     bd.random = randInt(0,25);
     bd.density = 100;
+    bd.pitchDecay = randInt(0,100);
+    snr.pitchDecay = randInt(0,100);
     
     hat.steps = 16;    
     if (probDo(0.5))  // Constant hi-hats
