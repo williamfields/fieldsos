@@ -5,13 +5,13 @@ function algoRandom()
     hat.seq = getTunedSequence();
     snr.seq = getTunedSequence();
 
-    bd.seqSteps = randInt(1,16);
-    hat.seqSteps = randInt(1,16);
-    snr.seqSteps = randInt(1,16);
+    bd.steps = randInt(1,16);
+    hat.steps = randInt(1,16);
+    snr.steps = randInt(1,16);
 
-    bd.seqMulti = randInt(1,16);
-    hat.seqMulti = randInt(1,16);
-    snr.seqMulti = randInt(1,16);
+    bd.multi = randInt(1,16);
+    hat.multi = randInt(1,16);
+    snr.multi = randInt(1,16);
 
     bd.decay = randInt(1,100);
     hat.decay = randInt(1,100);
@@ -21,9 +21,9 @@ function algoRandom()
     hat.density = randInt(0,100);
     snr.density = randInt(0,100);
 
-    bd.randomness = randInt(0,100);
-    hat.randomness = randInt(0,100);
-    snr.randomness = randInt(0,100);
+    bd.random = randInt(0,100);
+    hat.random = randInt(0,100);
+    snr.random = randInt(0,100);
 
     bd.frequency = randInt(20,200); 
     bd.octaves = randInt(0,8);
@@ -71,25 +71,25 @@ function algoHiphop()
     snr.seq[4] = 1;
     snr.seq[12] = 1;
 
-    hat.seqSteps = 16;
+    hat.steps = 16;
 
     // Constant hi-hats
     if (probDo(0.5))
     {
-        hat.seqSteps = 1;			
+        hat.steps = 1;			
         hat.seq[0] = 1;
     }
 
-    bd.seqSteps = 16;            
-    snr.seqSteps = 16;
+    bd.steps = 16;            
+    snr.steps = 16;
 
-    bd.seqMulti = 8;
-    hat.seqMulti = probDo(0.5) ? 4 : 8;
+    bd.multi = 8;
+    hat.multi = probDo(0.5) ? 4 : 8;
     if (probDo(0.25)) // Sometimes do triplet hats
     {
-        hat.seqMulti = 12;
+        hat.multi = 12;
     }            
-    snr.seqMulti = 8;
+    snr.multi = 8;
 
     bd.decay = Math.pow(Math.random(),0.5)*100;
     hat.decay = Math.pow(Math.random(),2)*100;
@@ -99,9 +99,9 @@ function algoHiphop()
     hat.density = 100;
     snr.density = 100;
 
-    bd.randomness = randInt(0,25);
-    hat.randomness = randInt(0,25);
-    snr.randomness = randInt(0,25);
+    bd.random = randInt(0,25);
+    hat.random = randInt(0,25);
+    snr.random = randInt(0,25);
 
     bd.frequency = randInt(20,100); 
     bd.octaves = randInt(0,4);
@@ -113,23 +113,23 @@ function algoTechno()
     algoRandom();
 
     bd.seq = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0];
-    bd.seqSteps = 16;            
-    bd.seqMulti = 8;
-    bd.randomness = randInt(0,25);
+    bd.steps = 16;            
+    bd.multi = 8;
+    bd.random = randInt(0,25);
     bd.density = 100;
     
-    hat.seqSteps = 16;    
+    hat.steps = 16;    
     if (probDo(0.5))  // Constant hi-hats
     {
-        hat.seqSteps = 1;			
+        hat.steps = 1;			
         hat.seq[0] = 1;
     }
-    hat.seqMulti = probDo(0.5) ? 4 : 8;
+    hat.multi = probDo(0.5) ? 4 : 8;
     hat.density = 100;
-    hat.randomness = randInt(0,25);
+    hat.random = randInt(0,25);
 
-    snr.seqSteps = 16;        
-    snr.seqMulti = probDo(0.5) ? 4 : 8;
+    snr.steps = 16;        
+    snr.multi = probDo(0.5) ? 4 : 8;
     snr.density = 100;    
-    snr.randomness = randInt(0,25);
+    snr.random = randInt(0,25);
 }

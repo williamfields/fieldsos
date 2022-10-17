@@ -5,23 +5,23 @@ class Patch
 {
     decay;
     seq;
-    seqSteps;
-    seqMulti;
+    steps;
+    multi;
     seqPos;
     seqPosPrev;
     density;        
-    randomness;
+    random;
 
     constructor()
     {
         this.seq = [];                
         this.decay = 50;
-        this.seqSteps = 16;
+        this.steps = 16;
         this.seqPos = 0;
         this.seqPosPrev = -1;
-        this.seqMulti = 8;
+        this.multi = 8;
         this.density = 100;      
-        this.randomness = 0;
+        this.random = 0;
     }
 }
 

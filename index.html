@@ -25,30 +25,27 @@
                 <option value="techno">Techno</option>
             </select>
 
-            <div class="sliderContainer">
-                <div class="sliderLabel">TEMPO</div>                    
-                <input id="tempoSlider" type="range" class="slider" min="1" max="200" value="120" oninput="tempoChanged(this.value);"><span id="tempoDisplay"  class="valueDisplay" >120</span>
-            </div>
-            <div class="sliderContainer">
-                <div class="sliderLabel">STEPS</div>
-                <input type="range" class="slider" min="1" max="16" value="16" oninput="stepsChanged(this.value);"><span class="valueDisplay" id="stepsDisplay"> 16</span>
-            </div>
-            <div class="sliderContainer">
-                <div class="sliderLabel">MULTI</div>
-                <input type="range" class="slider" min="1" max="16" value="8" oninput="multiChanged(this.value);"><span class="valueDisplay" id="multiDisplay">  8</span>
-            </div>
-            <div class="sliderContainer">
-                <div class="sliderLabel">RANDOM</div>
-                <input type="range" class="slider" min="0" max="100" value="0" oninput="randomnessChanged(this.value);"><span class="valueDisplay" id="randomnessDisplay">  0</span>
-            </div>
-            <div class="sliderContainer">                
-                <div class="sliderLabel">DENSITY</div>
-                <input type="range" class="slider" min="0" max="100" value="100" oninput="densityChanged(this.value);"><span class="valueDisplay" id="densityDisplay">100</span>
-            </div>
-            <div class="sliderContainer">
-                <div class="sliderLabel">DECAY</div>
-                <input type="range" class="slider" min="1" max="100" value="50" oninput="decayChanged(this.value);"><span class="valueDisplay" id="decayDisplay"> 50</span>
-            </div>
+            <script type="text/javascript">
+
+                var sliders = [
+                    { name: "tempo",        min: 1,     max: 200,   default: 120,       },
+                    { name: "steps",        min: 1,     max: 16,    default: 16,        },
+                    { name: "multi",        min: 1,     max: 16,    default: 8,         },
+                    { name: "random",       min: 0,     max: 100,   default: 0,         },
+                    { name: "density",      min: 0,     max: 100,   default: 100,       },
+                    { name: "decay",        min: 1,     max: 100,   default: 50,        },
+                    { name: "frequency",    min: 20,    max: 5000,   default: 500,   },
+                    { name: "octaves",      min: 0,     max: 8,   default: 2,           },
+                ];
+    
+                for (var i=0; i<sliders.length; i++)
+                {
+                    document.write("<div class='sliderContainer'>");                    
+                    document.write("<div class='sliderLabel'>"+sliders[i].name+"</div>");
+                    document.write("<input type=\"range\" class=\"slider\" min=\""+sliders[i].min+"\" max=\""+sliders[i].max+"\" value=\""+sliders[i].default+"\" oninput=\"sliderChanged('"+sliders[i].name+"',this.value);\"><span id=\""+sliders[i].name+"Display\" class=\"valueDisplay\">"+sliders[i].default+"</span>");
+                    document.write("</div>");
+                }
+            </script>
 
             <div class="checkboxContainer">
                 <div class="checkboxSubContainer">                
@@ -93,7 +90,7 @@
             var hatSelected = true;
             var snrSelected = true;
             var algo = "random";
-
+            
             function go()
             {
                 if (!playing)
@@ -142,61 +139,32 @@
                 snr.update();
             }
 
-            function tempoChanged(value)
+            function sliderChanged(sliderName, value)
             {
-                document.getElementById('tempoDisplay').innerHTML=value;
-                Tone.Transport.bpm.value=tempo=value;
-            }
-
-            function stepsChanged(value)
-            {                        
-                document.getElementById('stepsDisplay').innerHTML=value;
-                if (bdSelected)  bd.seqSteps=value;
-                if (hatSelected) hat.seqSteps=value;
-                if (snrSelected) snr.seqSteps=value;
-            }
-
-            function multiChanged(value)
-            {
-                document.getElementById('multiDisplay').innerHTML=value;
-                if (bdSelected) bd.seqMulti=value;
-                if (hatSelected) hat.seqMulti=value;
-                if (snrSelected) snr.seqMulti=value;
-            }
-
-            function densityChanged(value)
-            {
-                document.getElementById('densityDisplay').innerHTML=value;
-                if (bdSelected) bd.density=value;
-                if (hatSelected) hat.density=value;
-                if (snrSelected) snr.density=value;
-            }
-
-            function randomnessChanged(value)
-            {
-                document.getElementById('randomnessDisplay').innerHTML=value;
-                if (bdSelected) bd.randomness=value;
-                if (hatSelected) hat.randomness=value;
-                if (snrSelected) snr.randomness=value;
-            }
-
-            function decayChanged(value)
-            {
-                document.getElementById('decayDisplay').innerHTML=value;
-                if (bdSelected) 
+                // Special cases
+                if (sliderName == "tempo")
                 {
-                    bd.decay = value;
-                    bd.update();
+                    document.getElementById('tempoDisplay').innerHTML=value;
+                    Tone.Transport.bpm.value=tempo=value;
                 }
-                if (hatSelected)
+                else
                 {
-                    hat.decay = value;
-                    hat.update();
-                }            
-                if (snrSelected) 
-                {
-                    snr.decay = value;
-                    snr.update();
+                    document.getElementById(sliderName+'Display').innerHTML=value;
+                    if (bdSelected && typeof bd[sliderName] !== "undefined")
+                    {
+                        bd[sliderName]=value;
+                        bd.update();
+                    }
+                    if (hatSelected && typeof hat[sliderName] !== "undefined")
+                    {
+                        hat[sliderName]=value;
+                        hat.update();
+                    }                    
+                    if (snrSelected && typeof snr[sliderName] !== "undefined") 
+                    {
+                        snr[sliderName]=value;
+                        snr.update();
+                    }
                 }
             }
 
@@ -237,14 +205,14 @@
     
             function executeSequence(obj, time)
             {
-                if (obj.seqSteps == 1)  // Special case when step count is 1
+                if (obj.steps == 1)  // Special case when step count is 1
                 {
-                    obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % 2; // Pretend there are two steps
+                    obj.seqPos = Math.floor((counter/32)*obj.multi) % 2; // Pretend there are two steps
                     seqPosEffective = 0;                              // But always use the first value
                 }
                 else
                 {
-                    obj.seqPos = Math.floor((counter/32)*obj.seqMulti) % obj.seqSteps;
+                    obj.seqPos = Math.floor((counter/32)*obj.multi) % obj.steps;
                     seqPosEffective = obj.seqPos;
                 }            
                 if (obj.seqPos != obj.seqPosPrev)
@@ -255,7 +223,7 @@
                         {
                             obj.trigger(time, obj.seq[seqPosEffective]);
                         }
-                        else if (probDo(obj.randomness/100))  // otherwise, sometimes do something random
+                        else if (probDo(obj.random/100))  // otherwise, sometimes do something random
                         {
                             if (probDo(0.5))
                             {
