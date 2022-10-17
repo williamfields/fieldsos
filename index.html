@@ -6,7 +6,7 @@
         <title>FieldsOS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.48/Tone.js"></script>
-        <link rel="stylesheet" href="fieldsos.css?v=4">
+        <link rel="stylesheet" href="fieldsos.css?v=6">
     </head>
 
     <body>
@@ -28,56 +28,48 @@
             <script type="text/javascript">
 
                 var sliders = [
-                    { name: "tempo",        min: 1,     max: 200,   default: 120,       },
-                    { name: "steps",        min: 1,     max: 16,    default: 16,        },
-                    { name: "multi",        min: 1,     max: 16,    default: 8,         },
-                    { name: "random",       min: 0,     max: 100,   default: 0,         },
-                    { name: "density",      min: 0,     max: 100,   default: 100,       },
-                    { name: "decay",        min: 1,     max: 100,   default: 50,        },
-                    { name: "frequency",    min: 20,    max: 5000,   default: 500,   },
-                    { name: "octaves",      min: 0,     max: 8,   default: 2,           },
+                    { name: "tempo",        label:"TEMPO",      min: 1,     max: 200,   default: 120,       },
+                    { name: "steps",        label:"STEPS",      min: 1,     max: 16,    default: 16,        },
+                    { name: "multi",        label:"MULTI",      min: 1,     max: 16,    default: 8,         },
+                    { name: "random",       label:"RANDOM",     min: 0,     max: 100,   default: 0,         },
+                    { name: "density",      label:"DENSITY",    min: 0,     max: 100,   default: 100,       },
+                    { name: "decay",        label:"DECAY",      min: 1,     max: 100,   default: 50,        },
+                    { name: "frequency",    label:"FREQ",       min: 20,    max: 1000,  default: 500,       },
+                    { name: "octaves",      label:"FREQDROP",   min: 0,     max: 8,     default: 2,         },
                 ];
     
                 for (var i=0; i<sliders.length; i++)
                 {
                     document.write("<div class='sliderContainer'>");                    
-                    document.write("<div class='sliderLabel'>"+sliders[i].name+"</div>");
+                    document.write("<div class='sliderLabel'>"+sliders[i].label+"</div>");
                     document.write("<input type=\"range\" class=\"slider\" min=\""+sliders[i].min+"\" max=\""+sliders[i].max+"\" value=\""+sliders[i].default+"\" oninput=\"sliderChanged('"+sliders[i].name+"',this.value);\"><span id=\""+sliders[i].name+"Display\" class=\"valueDisplay\">"+sliders[i].default+"</span>");
                     document.write("</div>");
                 }
             </script>
 
             <div class="checkboxContainer">
-                <div class="checkboxSubContainer">                
-                <div>
-                    <input type="checkbox" class="selector" id="bdSelector" checked="checked" onchange="bdSelected=this.checked;">
-                </div>
-                <div>
-                    <label for="bdSelector">BD</label>
-                </div>
-                </div>
-                <div class="checkboxSubContainer">
-                    <div>
-                        <input type="checkbox" class="selector" id="hatSelector" checked="checked" onchange="hatSelected=this.checked;">
-                    </div>
-                    <div>
-                        <label for="hatSelector">HAT</label>
-                    </div>
-                </div>
-                <div class="checkboxSubContainer">
-                    <div>
-                        <input type="checkbox" class="selector" id="snrSelector" label="SNR" checked="checked" onchange="snrSelected=this.checked;">
-                    </div>
-                    <div>
-                        <label for="snrSelector">SNR</label>
-                    </div>
-                </div>
+                <label class="checkbox">
+                    <input type="checkbox" id="bdSelector" checked="checked" onchange="bdSelected=this.checked;">
+                    <span class="checkmark"></span>
+                    <div class="checkboxLabel">BD</div>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" id="hatSelector" checked="checked" onchange="hatSelected=this.checked;">
+                    <span class="checkmark"></span>
+                    <div class="checkboxLabel">HAT</div>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" id="snrSelector" checked="checked" onchange="snrSelected=this.checked;">
+                    <span class="checkmark"></span>
+                    <div class="checkboxLabel">SNR</div>
+                </label>
+
             </div>
         </div>
 
-        <script type="text/javascript" src="util.js?v=3"></script>
-        <script type="text/javascript" src="patches.js?v=3"></script>
-        <script type="text/javascript" src="algos.js?v=3"></script>
+        <script type="text/javascript" src="util.js?v=6"></script>
+        <script type="text/javascript" src="patches.js?v=6"></script>
+        <script type="text/javascript" src="algos.js?v=6"></script>
         <script type="text/javascript">
 
             // ------------------------------------------------
