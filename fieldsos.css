@@ -6,6 +6,7 @@ body {
     background-color: var(--bgcolor);
     font-size: 1.5em;
     font-family: monospace;
+    overflow-x: hidden;
 }
 
 .container {
@@ -137,3 +138,15 @@ input[type=range]::-webkit-slider-thumb {
   {
     margin-top:15px;    
   }
+
+
+  .disable-select{
+    user-select:none;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    -ms-user-select:none;
+  }
+
+
+
